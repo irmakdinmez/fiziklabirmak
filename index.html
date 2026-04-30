@@ -33,4 +33,608 @@
         h3 { margin-top: 0; margin-bottom: 15px; color: var(--secondary-color); border-bottom: 2px solid var(--secondary-color); display: inline-block; padding-bottom: 5px; }
         label { display: flex; align-items: center; margin: 15px 0 8px; font-weight: bold; font-size: 15px; color: #34495e; justify-content: space-between;}
         input[type="checkbox"] { width: 20px; height: 20px; margin-right: 10px; }
-        input[type="range"] { width: 100%; height: 8px; cursor:
+        input[type="range"] { width: 100%; height: 8px; cursor: pointer; }
+        .vector-box { display: inline-block; width: 16px; height: 16px; margin-right: 8px; border-radius: 4px; vertical-align: middle; }
+        
+        .highlight { color: #e74c3c; }
+        .formula-box { margin-top: 15px; background-color: #e8f4f8; padding: 15px; border-radius: 8px; border-left: 5px solid #3498db; font-size: 1.1em; }
+        
+        /* Çıktı Ekranları (Kondansatör ve Üreteç Ortak) */
+        .data-panel-c { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #2c3e50; padding: 15px; border-radius: 8px; color: white; margin-bottom: 20px;}
+        .data-item-c { display: flex; flex-direction: column; align-items: center; background: #34495e; padding: 10px; border-radius: 6px;}
+        .data-label-c { font-size: 12px; color: #bdc3c7; margin-bottom: 5px;}
+        .data-value-c { font-size: 18px; font-weight: bold; font-family: monospace; color: #f1c40f;}
+
+        /* Ohm Yasası Arayüzü */
+        .ohm-mode-switch { display: flex; gap: 10px; margin-bottom: 15px; }
+        .ohm-mode-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; background: #bdc3c7; color: #2c3e50; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .ohm-mode-btn.active { background: #3498db; color: white; }
+        .ohm-info-text { text-align: center; color: #7f8c8d; font-size: 0.85em; margin-bottom: 15px; font-style: italic; }
+        .ohm-dashboard { display: flex; justify-content: space-around; background: #ecf0f1; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+        .ohm-metric { text-align: center; }
+        .ohm-metric-title { font-size: 0.75em; color: #34495e; text-transform: uppercase; font-weight: bold; }
+        .ohm-metric-value { font-size: 1.4em; font-weight: bold; color: #e74c3c; }
+        .ohm-details-panel { background: #fff; border: 1px dashed #bdc3c7; border-radius: 8px; padding: 10px; margin-bottom: 15px; display: flex; justify-content: space-around; gap: 5px; }
+        .ohm-detail-box { background: #f8f9fa; padding: 8px; border-radius: 6px; text-align: center; flex: 1; border-left: 3px solid #f39c12; }
+        .ohm-detail-name { font-size: 0.75em; color: #7f8c8d; }
+        .ohm-detail-val { font-size: 1.1em; font-weight: bold; color: #f39c12; }
+        
+        /* Üreteçler Arayüzü */
+        .uretec-mode-switch { display: flex; gap: 10px; margin-top: 15px; margin-bottom: 5px;}
+        .uretec-mode-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; background: #bdc3c7; color: #2c3e50; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .uretec-mode-btn.active { background: #e67e22; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>İnteraktif Fizik Laboratuvarı</h1>
+        <p class="quote">"Hayatta en hakiki mürşit ilimdir, fendir." - Mustafa Kemal Atatürk</p>
+    </div>
+
+    <div class="container">
+        
+        <div id="mainMenu" class="simulation-grid">
+            
+            <div class="card">
+                <h3 style="border:none; color: #e67e22; margin:0;">11. Sınıf</h3>
+                <h2 style="margin: 10px 0;">Manyetik Alan</h2>
+                <p>Düz tel ve çemberin oluşturduğu bileşke alanı inceleyin.</p>
+                <button class="btn" onclick="openSimulation('manyetizma')">Deneyi Başlat</button>
+            </div>
+
+            <div class="card">
+                <h3 style="border:none; color: #9b59b6; margin:0;">10. Sınıf</h3>
+                <h2 style="margin: 10px 0;">Dalga Mekaniği</h2>
+                <p>Dalga boyu, frekans ve hız ilişkisini gözlemleyin.</p>
+                <button class="btn" onclick="openSimulation('dalga')">Deneyi Başlat</button>
+            </div>
+
+            <div class="card">
+                <h3 style="border:none; color: #27ae60; margin:0;">11. Sınıf</h3>
+                <h2 style="margin: 10px 0;">Paralel Levhalar</h2>
+                <p>Hızlandırıcı ve yavaşlatıcı potansiyellerin etkisini inceleyin.</p>
+                <button class="btn" onclick="openSimulation('levha')">Deneyi Başlat</button>
+            </div>
+
+            <div class="card">
+                <h3 style="border:none; color: #f39c12; margin:0;">11. Sınıf</h3>
+                <h2 style="margin: 10px 0;">Kondansatör (Sığaç)</h2>
+                <p>Levha alanı, mesafe ve dielektrik maddenin sığaya etkisini görün.</p>
+                <button class="btn" onclick="openSimulation('kondansator')">Deneyi Başlat</button>
+            </div>
+
+            <div class="card">
+                <h3 style="border:none; color: #34495e; margin:0;">10. Sınıf</h3>
+                <h2 style="margin: 10px 0;">Ohm Yasası ve Dirençler</h2>
+                <p>Seri ve paralel devrelerde akım, gerilim ve eşdeğer direnci hesaplayın.</p>
+                <button class="btn" onclick="openSimulation('ohm')">Deneyi Başlat</button>
+            </div>
+
+            <div class="card">
+                <h3 style="border:none; color: #c0392b; margin:0;">10. Sınıf</h3>
+                <h2 style="margin: 10px 0;">Üreteçlerin Bağlanması</h2>
+                <p>Pillerin seri ve paralel bağlanmasının akım ve lamba parlaklığına etkisini inceleyin.</p>
+                <button class="btn" onclick="openSimulation('uretec')">Deneyi Başlat</button>
+            </div>
+
+        </div>
+
+        <div id="simArea">
+            <button class="btn" onclick="closeSimulation()" style="background-color: #e74c3c; margin-bottom: 20px; width: auto;">⬅ Ana Menüye Dön</button>
+            
+            <div class="sim-layout">
+                <canvas id="canvas" width="700" height="450"></canvas>
+                
+                <div id="panel_manyetizma" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Sistem Kontrolleri</h3>
+                        <label style="color: #2980b9;"><input type="checkbox" id="checkWire" checked> Düz Tel (Sol)</label>
+                        <input type="range" id="sliderWire" min="-10" max="10" value="6">
+                        
+                        <label style="color: #27ae60; margin-top: 25px;"><input type="checkbox" id="checkLoop" checked> Çember (Sağ)</label>
+                        <input type="range" id="sliderLoop" min="-10" max="10" value="6">
+                    </div>
+                </div>
+
+                <div id="panel_dalga" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Dalga Parametreleri</h3>
+                        <label style="display:block;">Frekans (f): <span id="freq-val" class="highlight">1.0</span> Hz</label>
+                        <input type="range" id="freq" min="0.1" max="5.0" step="0.1" value="1.0">
+                        <label style="display:block;">Dalga Boyu (λ): <span id="wave-val" class="highlight">100</span> px</label>
+                        <input type="range" id="wave" min="50" max="300" step="10" value="100">
+                    </div>
+                </div>
+
+                <div id="panel_levha" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Levha Potansiyelleri</h3>
+                        <label style="display:block;">Hızlandırıcı (V_acc): <span id="vacc-val" class="highlight">50</span> V</label>
+                        <input type="range" id="Vacc" min="0" max="100" step="1" value="50">
+                        <label style="display:block;">Yavaşlatıcı (V_dec): <span id="vdec-val" class="highlight">30</span> V</label>
+                        <input type="range" id="Vdec" min="0" max="100" step="1" value="30">
+                    </div>
+                    <button id="btn_fire" class="btn" style="background-color: #27ae60; margin-top: 20px;">Parçacığı Fırlat</button>
+                </div>
+
+                <div id="panel_kondansator" class="panel" style="display: none;">
+                    <div class="data-panel-c">
+                        <div class="data-item-c"><span class="data-label-c">SIĞA (C)</span><span class="data-value-c" id="outC">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">YÜK (Q)</span><span class="data-value-c" id="outQ">0.00</span></div>
+                    </div>
+                    <div class="control-group" style="border:none; padding:0;">
+                        <label>Alan (A): <span id="valA" class="highlight">50</span></label>
+                        <input type="range" id="sliderA" min="10" max="100" value="50">
+                        <label>Mesafe (d): <span id="valD" class="highlight">20</span></label>
+                        <input type="range" id="sliderD" min="5" max="40" value="20">
+                        <label>Pil (V): <span id="valV" class="highlight">12</span>V</label>
+                        <input type="range" id="sliderV" min="0" max="24" value="12">
+                    </div>
+                </div>
+
+                <div id="panel_ohm" class="panel" style="display: none; width: 380px;">
+                    <div class="ohm-mode-switch">
+                        <button id="btn-seri" class="ohm-mode-btn active">SERİ BAĞLANTI</button>
+                        <button id="btn-paralel" class="ohm-mode-btn">PARALEL BAĞLANTI</button>
+                    </div>
+                    <div class="ohm-info-text" id="ohm-mode-desc">Seri bağlı dirençlerde akım sabittir, gerilim bölünür.</div>
+                    <div class="ohm-dashboard">
+                        <div class="ohm-metric"><div class="ohm-metric-title">Eşdeğer (R_eş)</div><div class="ohm-metric-value" id="ohm-val-req">0.00 Ω</div></div>
+                        <div class="ohm-metric"><div class="ohm-metric-title">Ana Akım (I)</div><div class="ohm-metric-value" id="ohm-val-itot">0.00 A</div></div>
+                    </div>
+                    <div class="control-group" style="margin-bottom: 0;">
+                        <label>Üreteç Gerilimi: <span id="ohm-lbl-v" class="highlight">24</span> V</label>
+                        <input type="range" id="ohm-inp-v" min="1" max="60" value="24" step="1">
+                        <label>R1 Direnci: <span id="ohm-lbl-r1" class="highlight">4</span> Ω</label>
+                        <input type="range" id="ohm-inp-r1" min="1" max="50" value="4" step="1">
+                        <label>R2 Direnci: <span id="ohm-lbl-r2" class="highlight">6</span> Ω</label>
+                        <input type="range" id="ohm-inp-r2" min="1" max="50" value="6" step="1">
+                        <label>R3 Direnci: <span id="ohm-lbl-r3" class="highlight">12</span> Ω</label>
+                        <input type="range" id="ohm-inp-r3" min="1" max="50" value="12" step="1">
+                    </div>
+                </div>
+
+                <div id="panel_uretec" class="panel" style="display: none; width: 380px;">
+                    
+                    <div class="data-panel-c">
+                        <div class="data-item-c"><span class="data-label-c">TOPLAM EMK</span><span class="data-value-c" id="ur-val-emk" style="color:#e67e22">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">ANA AKIM (I)</span><span class="data-value-c" id="ur-val-i" style="color:#3498db">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">EŞDEĞER r</span><span class="data-value-c" id="ur-val-r" style="color:#bdc3c7">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">LAMBA GÜCÜ (P)</span><span class="data-value-c" id="ur-val-p" style="color:#f1c40f">0.00</span></div>
+                    </div>
+
+                    <div class="control-group" style="border:none; padding:0;">
+                        
+                        <div class="uretec-mode-switch">
+                            <button id="ur-btn-seri" class="uretec-mode-btn active">PİLLER SERİ</button>
+                            <button id="ur-btn-paralel" class="uretec-mode-btn">PİLLER PARALEL</button>
+                        </div>
+                        
+                        <label style="margin-top:20px;">Üreteç Sayısı (n): <span id="ur-lbl-n" class="highlight">3</span></label>
+                        <input type="range" id="ur-inp-n" min="1" max="10" value="3" step="1">
+                        
+                        <label>1 Pilin Emk'sı (ε): <span id="ur-lbl-e" class="highlight">1.5</span> V</label>
+                        <input type="range" id="ur-inp-e" min="1.0" max="12.0" value="1.5" step="0.5">
+                        
+                        <label>1 Pilin İç Direnci (r): <span id="ur-lbl-r_in" class="highlight">0.5</span> Ω</label>
+                        <input type="range" id="ur-inp-r_in" min="0.0" max="5.0" value="0.5" step="0.1">
+                        
+                        <label>Dış Direnç / Lamba (R): <span id="ur-lbl-R" class="highlight">10</span> Ω</label>
+                        <input type="range" id="ur-inp-R" min="1" max="50" value="10" step="1">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let currentSimulation = ''; 
+        let animasyonID; 
+
+        // ORTAK: Mouse Takibi
+        let cursor = { x: 350, y: 225 };
+        function updateCursor(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            if(clientX && clientY) {
+                cursor.x = clientX - rect.left;
+                cursor.y = clientY - rect.top;
+                if(currentSimulation === 'manyetizma') drawManyetizma();
+            }
+        }
+        canvas.addEventListener('mousemove', updateCursor);
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); updateCursor(e); }, {passive: false});
+
+        // 1. MANYETİZMA
+        const K_mag = 2500; 
+        function drawCurrentMark(x, y, val) {
+            ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill();
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2.5; ctx.stroke();
+            if(val > 0) { ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI*2); ctx.fillStyle = '#333'; ctx.fill(); } 
+            else if (val < 0) { ctx.beginPath(); ctx.moveTo(x-6, y-6); ctx.lineTo(x+6, y+6); ctx.moveTo(x+6, y-6); ctx.lineTo(x-6, y+6); ctx.stroke(); }
+        }
+        function drawArrow(x, y, vx, vy, color, width) {
+            let len = Math.sqrt(vx*vx + vy*vy); if (len < 1) return;
+            let maxLen = 150; let scale = len > maxLen ? maxLen / len : 1; vx *= scale; vy *= scale;
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + vx, y + vy); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.stroke();
+            const angle = Math.atan2(vy, vx); ctx.save(); ctx.translate(x + vx, y + vy); ctx.rotate(angle);
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-12, 6); ctx.lineTo(-12, -6); ctx.fillStyle = color; ctx.fill(); ctx.restore();
+        }
+        function drawManyetizma() {
+            ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,canvas.width, canvas.height); 
+            const iW = parseFloat(document.getElementById('sliderWire').value);
+            const iL = parseFloat(document.getElementById('sliderLoop').value);
+            const showWire = document.getElementById('checkWire').checked;
+            const showLoop = document.getElementById('checkLoop').checked;
+            let netB = { x: 0, y: 0 }, bWire = { x: 0, y: 0 }, bLoop = { x: 0, y: 0 };
+            if(showWire && iW !== 0) {
+                drawCurrentMark(200, 225, iW); ctx.fillStyle = "#7f8c8d"; ctx.font = "14px Arial"; ctx.fillText("Düz Tel", 175, 260);
+                let dx = cursor.x - 200, dy = cursor.y - 225, r2 = dx*dx + dy*dy;
+                if(r2 > 150) { bWire = { x: K_mag * iW * dy / r2, y: -K_mag * iW * dx / r2 }; netB.x += bWire.x; netB.y += bWire.y; }
+            } else if (showWire) drawCurrentMark(200, 225, 0);
+            if(showLoop) {
+                ctx.beginPath(); ctx.ellipse(500, 225, 30, 80, 0, 0, Math.PI*2); ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 2; ctx.stroke();
+                ctx.fillStyle = "#7f8c8d"; ctx.font = "14px Arial"; ctx.fillText("Çember", 475, 335);
+                if(iL !== 0) {
+                    drawCurrentMark(500, 145, iL); drawCurrentMark(500, 305, -iL);
+                    [[500, 145, iL], [500, 305, -iL]].forEach(src => {
+                        let dx = cursor.x - src[0], dy = cursor.y - src[1], r2 = dx*dx + dy*dy;
+                        if(r2 > 150) { bLoop.x += K_mag * src[2] * dy / r2; bLoop.y += -K_mag * src[2] * dx / r2; }
+                    });
+                    netB.x += bLoop.x; netB.y += bLoop.y;
+                } else { drawCurrentMark(500, 145, 0); drawCurrentMark(500, 305, 0); }
+            }
+            ctx.beginPath(); ctx.arc(cursor.x, cursor.y, 5, 0, Math.PI*2); ctx.fillStyle = '#e74c3c'; ctx.fill();
+            if(showWire) drawArrow(cursor.x, cursor.y, bWire.x, bWire.y, '#2980b9', 3);
+            if(showLoop) drawArrow(cursor.x, cursor.y, bLoop.x, bLoop.y, '#27ae60', 3);
+            if((showWire && iW !== 0) || (showLoop && iL !== 0)) drawArrow(cursor.x, cursor.y, netB.x, netB.y, '#e74c3c', 5);
+        }
+
+        // DEĞİŞKENLER
+        let particle = { x: 100, v: 0, running: false };
+        let ohmMode = 'seri';
+        let ohmVals = { V: 24, R1: 4, R2: 6, R3: 12, Req: 0, Itot: 0, val1: 0, val2: 0, val3: 0 };
+        let urMode = 'seri';
+
+        function openSimulation(simId) {
+            currentSimulation = simId;
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('simArea').style.display = 'block';
+            
+            // Tüm Panelleri Gizle
+            document.getElementById('panel_manyetizma').style.display = 'none';
+            document.getElementById('panel_dalga').style.display = 'none';
+            document.getElementById('panel_levha').style.display = 'none';
+            document.getElementById('panel_kondansator').style.display = 'none';
+            document.getElementById('panel_ohm').style.display = 'none';
+            document.getElementById('panel_uretec').style.display = 'none';
+
+            if (animasyonID) cancelAnimationFrame(animasyonID);
+
+            // Arka Plan
+            if(simId === 'kondansator' || simId === 'ohm' || simId === 'uretec') { canvas.style.background = '#1e1e24'; } 
+            else { canvas.style.background = '#ffffff'; }
+
+            // 1. MANYETİZMA
+            if(simId === 'manyetizma') {
+                document.getElementById('panel_manyetizma').style.display = 'block';
+                document.getElementById('sliderWire').addEventListener('input', drawManyetizma);
+                document.getElementById('sliderLoop').addEventListener('input', drawManyetizma);
+                document.getElementById('checkWire').addEventListener('change', drawManyetizma);
+                document.getElementById('checkLoop').addEventListener('change', drawManyetizma);
+                drawManyetizma(); 
+            }
+            // 2. DALGA
+            else if(simId === 'dalga') {
+                document.getElementById('panel_dalga').style.display = 'block';
+                const freqSlider = document.getElementById('freq'), waveSlider = document.getElementById('wave'), ampSlider = document.getElementById('amp');
+                let time = 0, lastTime = performance.now();
+
+                function cizDalga() {
+                    let currentTime = performance.now(), dt = (currentTime - lastTime) / 1000;
+                    lastTime = currentTime; time += dt;
+                    let f = parseFloat(freqSlider.value), lambda = parseFloat(waveSlider.value), A = parseFloat(ampSlider.value), v = f * lambda;
+                    document.getElementById('freq-val').innerText = f.toFixed(1); 
+                    document.getElementById('wave-val').innerText = lambda; 
+                    document.getElementById('amp-val').innerText = A; 
+                    document.getElementById('speed-val').innerText = v.toFixed(1);
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.beginPath(); ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
+                    ctx.strokeStyle = '#bdc3c7'; ctx.setLineDash([5, 5]); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.beginPath(); ctx.strokeStyle = '#3498db'; ctx.lineWidth = 4;
+                    for (let x = 0; x < canvas.width; x++) {
+                        let y = canvas.height / 2 - A * Math.sin(2 * Math.PI * (x / lambda - f * time));
+                        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    animasyonID = requestAnimationFrame(cizDalga);
+                }
+                cizDalga();
+            }
+            // 3. LEVHALAR
+            else if(simId === 'levha') {
+                document.getElementById('panel_levha').style.display = 'block';
+                const vaccSlider = document.getElementById('Vacc'), vdecSlider = document.getElementById('Vdec');
+                particle = { x: 100, v: 0, running: false };
+                document.getElementById('btn_fire').onclick = () => { particle.x = 100; particle.v = 0; particle.running = true; };
+
+                function cizLevha() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    let V_acc = parseFloat(vaccSlider.value), V_dec = parseFloat(vdecSlider.value);
+                    document.getElementById('vacc-val').innerText = V_acc; document.getElementById('vdec-val').innerText = V_dec;
+
+                    let q = 1.0, m = 10.0, d = 1.0; 
+                    let a1 = (q * V_acc) / (m * d); let v1_max = Math.sqrt(2 * a1 * d); let a2 = (q * V_dec) / (m * d);
+                    let K_acc = 0.5 * m * (v1_max * v1_max); let K_son = K_acc - (q * V_dec);
+                    let v2_son = (K_son >= 0) ? Math.sqrt(2 * K_son / m) : 0;
+
+                    ctx.fillStyle = 'rgba(46, 204, 113, 0.1)'; ctx.fillRect(100, 0, 250, 450); 
+                    ctx.fillStyle = 'rgba(231, 76, 60, 0.1)'; ctx.fillRect(350, 0, 250, 450); 
+
+                    ctx.fillStyle = '#7f8c8d';
+                    ctx.fillRect(95, 125, 10, 200); ctx.fillRect(345, 125, 10, 200); ctx.fillRect(595, 125, 10, 200); 
+                    
+                    ctx.font = '16px Arial'; ctx.fillStyle = '#2c3e50';
+                    ctx.fillText(`+${V_acc}V`, 80, 110); ctx.fillText(`0V`, 345, 110); ctx.fillText(`+${V_dec}V`, 585, 110);
+                    ctx.font = '15px Consolas, monospace';
+                    ctx.fillText(`[BÖLGE 1] İvme(a1): ${a1.toFixed(2)} | V_max: ${v1_max.toFixed(2)}`, 110, 360);
+                    let bolge2_durum = K_son < 0 ? "GERİ DÖNER!" : `V_son: ${v2_son.toFixed(2)}`;
+                    ctx.fillText(`[BÖLGE 2] İvme(a2): -${a2.toFixed(2)} | Durum: ${bolge2_durum}`, 110, 390);
+
+                    ctx.beginPath(); ctx.arc(particle.x, 225, 12, 0, Math.PI * 2); ctx.fillStyle = '#e74c3c'; ctx.fill();
+                    ctx.fillStyle = 'white'; ctx.font = '14px Arial'; ctx.fillText('+', particle.x - 4, 230);
+
+                    if(particle.running) {
+                        let dt = 0.2; 
+                        if(particle.x >= 100 && particle.x < 350) particle.v += a1 * dt; 
+                        else if(particle.x >= 350 && particle.x <= 600) particle.v -= a2 * dt; 
+                        particle.x += particle.v;
+                        if(particle.x >= 600) { particle.x = 600; particle.v = 0; particle.running = false; }
+                        else if(particle.x <= 100 && particle.v < 0) { particle.x = 100; particle.v = 0; particle.running = false; }
+                    }
+                    animasyonID = requestAnimationFrame(cizLevha);
+                }
+                cizLevha();
+            }
+            // 4. KONDANSATÖR
+            else if(simId === 'kondansator') {
+                document.getElementById('panel_kondansator').style.display = 'block';
+                const sA = document.getElementById('sliderA'), sD = document.getElementById('sliderD'), sV = document.getElementById('sliderV');
+                let t_alan = 0;
+
+                function cizKondansator() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    let A = parseFloat(sA.value), d = parseFloat(sD.value), V = parseFloat(sV.value), K_die = 1;
+                    document.getElementById('valA').innerText = A; document.getElementById('valD').innerText = d; document.getElementById('valV').innerText = V;
+
+                    let epsilon0 = 8.85; 
+                    let C = (K_die * epsilon0 * A) / d, Q = C * V, E = V / d;
+                    document.getElementById('outC').innerText = C.toFixed(2); document.getElementById('outQ').innerText = Q.toFixed(2);
+
+                    let levhaBoyu = 100 + (A * 2), levhaAraligi = d * 5;
+                    let merkezY = canvas.height / 2, solX = canvas.width/2 - levhaAraligi/2, sagX = canvas.width/2 + levhaAraligi/2, ustY = merkezY - levhaBoyu/2;
+
+                    ctx.strokeStyle = '#555'; ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.moveTo(solX, merkezY); ctx.lineTo(solX - 100, merkezY); ctx.lineTo(solX - 100, 400); 
+                    ctx.moveTo(sagX, merkezY); ctx.lineTo(sagX + 100, merkezY); ctx.lineTo(sagX + 100, 400); ctx.stroke();
+
+                    ctx.fillStyle = '#2c3e50'; ctx.fillRect(solX - 120, 380, sagX - solX + 240, 40);
+                    ctx.fillStyle = '#e74c3c'; ctx.fillRect(solX - 105, 385, 20, 30); 
+                    ctx.fillStyle = '#3498db'; ctx.fillRect(sagX + 85, 385, 20, 30);  
+                    ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.fillText(`${V} Volt Pil`, canvas.width/2 - 40, 405);
+
+                    ctx.fillStyle = '#e74c3c'; ctx.fillRect(solX - 10, ustY, 10, levhaBoyu);
+                    ctx.fillStyle = '#3498db'; ctx.fillRect(sagX, ustY, 10, levhaBoyu);
+
+                    if(V > 0) {
+                        let yukSayisi = Math.min(Math.floor(Q / 50), 20), adim = levhaBoyu / (yukSayisi + 1);
+                        ctx.fillStyle = '#fff'; ctx.font = '14px Arial';
+                        for(let i=1; i<=yukSayisi; i++) { ctx.fillText('+', solX - 25, ustY + (i*adim) + 5); ctx.fillText('-', sagX + 15, ustY + (i*adim) + 4); }
+
+                        let cizgiSayisi = Math.min(Math.floor(E * 5), 15), cizgiAdim = levhaBoyu / (cizgiSayisi + 1);
+                        ctx.strokeStyle = 'rgba(231, 76, 60, 0.6)'; ctx.lineWidth = 1.5; t_alan += 0.5; 
+                        
+                        for(let i=1; i<=cizgiSayisi; i++) {
+                            let cY = ustY + (i*cizgiAdim);
+                            ctx.beginPath(); ctx.moveTo(solX, cY); ctx.lineTo(sagX, cY); ctx.stroke();
+                            let okX = solX + ((t_alan + i*10) % levhaAraligi); 
+                            if(okX > solX && okX < sagX) {
+                                ctx.beginPath(); ctx.moveTo(okX, cY); ctx.lineTo(okX - 6, cY - 4); ctx.lineTo(okX - 6, cY + 4); 
+                                ctx.fillStyle = 'rgba(231, 76, 60, 0.8)'; ctx.fill();
+                            }
+                        }
+                    }
+                    animasyonID = requestAnimationFrame(cizKondansator);
+                }
+                cizKondansator();
+            }
+            // 5. OHM YASASI
+            else if(simId === 'ohm') {
+                document.getElementById('panel_ohm').style.display = 'block';
+                const btnSeri = document.getElementById('btn-seri'), btnParalel = document.getElementById('btn-paralel');
+                const inputs = ['v', 'r1', 'r2', 'r3'].map(id => document.getElementById(`ohm-inp-${id}`));
+                
+                function updateOhmCalc() {
+                    ohmVals.V = parseFloat(document.getElementById('ohm-inp-v').value);
+                    ohmVals.R1 = parseFloat(document.getElementById('ohm-inp-r1').value);
+                    ohmVals.R2 = parseFloat(document.getElementById('ohm-inp-r2').value);
+                    ohmVals.R3 = parseFloat(document.getElementById('ohm-inp-r3').value);
+
+                    document.getElementById('ohm-lbl-v').innerText = ohmVals.V;
+                    document.getElementById('ohm-lbl-r1').innerText = ohmVals.R1;
+                    document.getElementById('ohm-lbl-r2').innerText = ohmVals.R2;
+                    document.getElementById('ohm-lbl-r3').innerText = ohmVals.R3;
+
+                    if (ohmMode === 'seri') {
+                        ohmVals.Req = ohmVals.R1 + ohmVals.R2 + ohmVals.R3;
+                        ohmVals.Itot = ohmVals.V / ohmVals.Req;
+                        ohmVals.val1 = ohmVals.Itot * ohmVals.R1; ohmVals.val2 = ohmVals.Itot * ohmVals.R2; ohmVals.val3 = ohmVals.Itot * ohmVals.R3;
+                    } else {
+                        ohmVals.Req = 1 / ((1/ohmVals.R1) + (1/ohmVals.R2) + (1/ohmVals.R3));
+                        ohmVals.Itot = ohmVals.V / ohmVals.Req;
+                        ohmVals.val1 = ohmVals.V / ohmVals.R1; ohmVals.val2 = ohmVals.V / ohmVals.R2; ohmVals.val3 = ohmVals.V / ohmVals.R3;
+                    }
+                    document.getElementById('ohm-val-req').innerText = ohmVals.Req.toFixed(2) + " Ω";
+                    document.getElementById('ohm-val-itot').innerText = ohmVals.Itot.toFixed(2) + " A";
+                }
+
+                btnSeri.onclick = () => { ohmMode = 'seri'; btnSeri.classList.add('active'); btnParalel.classList.remove('active'); updateOhmCalc(); };
+                btnParalel.onclick = () => { ohmMode = 'paralel'; btnParalel.classList.add('active'); btnSeri.classList.remove('active'); updateOhmCalc(); };
+                inputs.forEach(inp => inp.addEventListener('input', updateOhmCalc));
+                updateOhmCalc();
+
+                function drawResistor(x, y, label, valText) {
+                    ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x, y);
+                    for(let i=0; i<4; i++) { ctx.lineTo(x + 10 + (i*20), y - 10); ctx.lineTo(x + 20 + (i*20), y + 10); }
+                    ctx.lineTo(x + 100, y); ctx.stroke();
+                    ctx.fillStyle = '#fff'; ctx.font = '14px Arial'; ctx.textAlign = 'center'; ctx.fillText(label, x + 50, y - 20);
+                    ctx.fillStyle = '#3498db'; ctx.font = 'bold 16px Arial'; ctx.fillText(valText, x + 50, y + 30);
+                }
+
+                function animateOhm() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.moveTo(100, 225); ctx.lineTo(100, 400); ctx.lineTo(350, 400); ctx.lineTo(600, 400); ctx.lineTo(600, 225); ctx.stroke();
+                    
+                    ctx.fillStyle = '#2c3e50'; ctx.fillRect(310, 380, 80, 40);
+                    ctx.fillStyle = '#e74c3c'; ctx.fillRect(300, 385, 10, 30); 
+                    ctx.fillStyle = '#3498db'; ctx.fillRect(390, 385, 10, 30); 
+                    ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.textAlign = 'center';
+                    ctx.fillText(`${ohmVals.V}V`, 350, 365);
+                    ctx.fillStyle = '#e74c3c'; ctx.fillText(`Ana Akım: ${ohmVals.Itot.toFixed(2)}A`, 350, 440);
+
+                    if(ohmMode === 'seri') {
+                        ctx.beginPath(); ctx.moveTo(100, 225); ctx.lineTo(150, 225); ctx.moveTo(250, 225); ctx.lineTo(300, 225); ctx.moveTo(400, 225); ctx.lineTo(450, 225); ctx.moveTo(550, 225); ctx.lineTo(600, 225); ctx.stroke();
+                        drawResistor(150, 225, `R1: ${ohmVals.R1}Ω`, `${ohmVals.val1.toFixed(1)}V`); drawResistor(300, 225, `R2: ${ohmVals.R2}Ω`, `${ohmVals.val2.toFixed(1)}V`); drawResistor(450, 225, `R3: ${ohmVals.R3}Ω`, `${ohmVals.val3.toFixed(1)}V`);
+                    } else {
+                        ctx.beginPath(); ctx.moveTo(100, 100); ctx.lineTo(100, 350); ctx.moveTo(600, 100); ctx.lineTo(600, 350);
+                        [100, 225, 350].forEach(y => { ctx.moveTo(100, y); ctx.lineTo(250, y); ctx.moveTo(350, y); ctx.lineTo(600, y); }); ctx.stroke();
+                        drawResistor(250, 100, `R1: ${ohmVals.R1}Ω`, `${ohmVals.val1.toFixed(2)}A`); drawResistor(250, 225, `R2: ${ohmVals.R2}Ω`, `${ohmVals.val2.toFixed(2)}A`); drawResistor(250, 350, `R3: ${ohmVals.R3}Ω`, `${ohmVals.val3.toFixed(2)}A`);
+                    }
+                    animasyonID = requestAnimationFrame(animateOhm);
+                }
+                animateOhm();
+            }
+            // 6. YENİ: ÜRETEÇLER
+            else if(simId === 'uretec') {
+                document.getElementById('panel_uretec').style.display = 'block';
+                
+                const btnUrSeri = document.getElementById('ur-btn-seri');
+                const btnUrParalel = document.getElementById('ur-btn-paralel');
+                const inp_n = document.getElementById('ur-inp-n'), inp_e = document.getElementById('ur-inp-e'), inp_r_in = document.getElementById('ur-inp-r_in'), inp_R = document.getElementById('ur-inp-R');
+                
+                let urVals = { n: 3, e: 1.5, r_in: 0.5, R: 10, v_top: 0, r_top: 0, I: 0, P: 0, brightness: 0 };
+
+                function updateUrCalc() {
+                    urVals.n = parseFloat(inp_n.value); urVals.e = parseFloat(inp_e.value); urVals.r_in = parseFloat(inp_r_in.value); urVals.R = parseFloat(inp_R.value);
+
+                    document.getElementById('ur-lbl-n').innerText = urVals.n;
+                    document.getElementById('ur-lbl-e').innerText = urVals.e.toFixed(1);
+                    document.getElementById('ur-lbl-r_in').innerText = urVals.r_in.toFixed(1);
+                    document.getElementById('ur-lbl-R').innerText = urVals.R;
+
+                    if (urMode === 'seri') { urVals.v_top = urVals.n * urVals.e; urVals.r_top = urVals.n * urVals.r_in; } 
+                    else { urVals.v_top = urVals.e; urVals.r_top = urVals.r_in / urVals.n; }
+
+                    urVals.I = urVals.v_top / (urVals.R + urVals.r_top);
+                    urVals.P = Math.pow(urVals.I, 2) * urVals.R;
+                    urVals.brightness = Math.min(urVals.P / 5, 1);
+
+                    document.getElementById('ur-val-emk').innerText = urVals.v_top.toFixed(2) + " V";
+                    document.getElementById('ur-val-r').innerText = urVals.r_top.toFixed(2) + " Ω";
+                    document.getElementById('ur-val-i').innerText = urVals.I.toFixed(2) + " A";
+                    document.getElementById('ur-val-p').innerText = urVals.P.toFixed(2) + " W";
+                }
+
+                btnUrSeri.onclick = () => { urMode = 'seri'; btnUrSeri.classList.add('active'); btnUrParalel.classList.remove('active'); updateUrCalc(); };
+                btnUrParalel.onclick = () => { urMode = 'paralel'; btnUrParalel.classList.add('active'); btnUrSeri.classList.remove('active'); updateUrCalc(); };
+                [inp_n, inp_e, inp_r_in, inp_R].forEach(inp => inp.addEventListener('input', updateUrCalc));
+                updateUrCalc();
+
+                // ÇİZİM FONKSİYONU
+                function drawUrSystem() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Ana Devre Kabloları
+                    ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.moveTo(200, 225); ctx.lineTo(200, 100); ctx.lineTo(500, 100); ctx.lineTo(500, 225); ctx.stroke();
+
+                    // Lamba Çizimi
+                    let lambaX = 350, lambaY = 100;
+                    
+                    // Parlama Efekti
+                    if (urVals.P > 0.01) {
+                        ctx.beginPath(); ctx.arc(lambaX, lambaY, 30 + urVals.brightness * 40, 0, Math.PI * 2);
+                        let gradient = ctx.createRadialGradient(lambaX, lambaY, 10, lambaX, lambaY, 30 + urVals.brightness * 40);
+                        gradient.addColorStop(0, `rgba(255, 215, 0, ${0.4 + urVals.brightness * 0.4})`);
+                        gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                        ctx.fillStyle = gradient; ctx.fill();
+                    }
+
+                    // Ampulün kendisi
+                    ctx.beginPath(); ctx.arc(lambaX, lambaY, 20, 0, Math.PI * 2);
+                    ctx.fillStyle = urVals.P > 0.01 ? `rgba(255, 240, 100, ${0.5 + urVals.brightness * 0.5})` : '#333';
+                    ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#555'; ctx.stroke();
+                    
+                    // Duy
+                    ctx.fillStyle = '#7f8c8d'; ctx.fillRect(lambaX - 10, lambaY + 15, 20, 15);
+                    
+                    // R Etiketi
+                    ctx.fillStyle = '#fff'; ctx.font = '16px Arial'; ctx.textAlign = 'center';
+                    ctx.fillText(`Lamba R: ${urVals.R} Ω`, lambaX, lambaY - 40);
+
+                    // Pillerin Çizimi
+                    let pilStart = 0;
+                    let pilAralik = 0;
+                    
+                    if (urMode === 'seri') {
+                        // Seri Piller (Yan yana)
+                        pilAralik = 300 / urVals.n; // 200 ile 500 arasına sığdır
+                        pilStart = 200 + (300 - (urVals.n * 40)) / 2; // Ortalama
+
+                        ctx.beginPath(); ctx.moveTo(200, 225); ctx.lineTo(500, 225); ctx.stroke();
+
+                        for(let i=0; i<urVals.n; i++) {
+                            let px = pilStart + (i * 40);
+                            ctx.fillStyle = '#2c3e50'; ctx.fillRect(px, 210, 30, 30);
+                            ctx.fillStyle = '#e74c3c'; ctx.fillRect(px, 210, 5, 30); // Artı
+                        }
+                    } else {
+                        // Paralel Piller (Alt alta)
+                        pilAralik = 200 / urVals.n;
+                        let yStart = 225 - (urVals.n * pilAralik) / 2 + (pilAralik/2);
+
+                        // Bağlantı kolları
+                        ctx.beginPath(); ctx.moveTo(200, yStart); ctx.lineTo(200, yStart + (urVals.n-1)*pilAralik); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(500, yStart); ctx.lineTo(500, yStart + (urVals.n-1)*pilAralik); ctx.stroke();
+
+                        for(let i=0; i<urVals.n; i++) {
+                            let py = yStart + (i * pilAralik);
+                            ctx.beginPath(); ctx.moveTo(200, py); ctx.lineTo(500, py); ctx.stroke();
+                            
+                            ctx.fillStyle = '#2c3e50'; ctx.fillRect(335, py - 15, 30, 30);
+                            ctx.fillStyle = '#e74c3c'; ctx.fillRect(335, py - 15, 5, 30); // Artı
+                        }
+                    }
+
+                    animasyonID = requestAnimationFrame(drawUrSystem);
+                }
+                drawUrSystem();
+            }
+        }
+
+        function closeSimulation() {
+            currentSimulation = '';
+            if (animasyonID) cancelAnimationFrame(animasyonID); 
+            document.getElementById('mainMenu').style.display = 'flex';
+            document.getElementById('simArea').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
