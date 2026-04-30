@@ -19,25 +19,30 @@
         .container { max-width: 1200px; margin: 2rem auto; padding: 0 20px; }
         
         .simulation-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 1.5rem; width: 300px; text-align: center; transition: transform 0.3s; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 1.5rem; width: 280px; text-align: center; transition: transform 0.3s; }
         .card:hover { transform: translateY(-5px); }
         .btn { background-color: var(--primary-color); color: white; padding: 10px 20px; border-radius: 4px; border: none; cursor: pointer; margin-top: 15px; font-size: 16px; width: 100%; transition: background 0.3s; font-weight: bold; }
         .btn:hover { background-color: var(--secondary-color); }
 
         #simArea { display: none; }
         .sim-layout { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; }
-        canvas { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: crosshair; touch-action: none; max-width: 100%; }
+        canvas { background: #1e1e24; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: crosshair; touch-action: none; max-width: 100%; border: 2px solid #bdc3c7; }
         
-        .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 320px; box-sizing: border-box; }
+        .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 340px; box-sizing: border-box; }
         .control-group { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
         h3 { margin-top: 0; margin-bottom: 15px; color: var(--secondary-color); border-bottom: 2px solid var(--secondary-color); display: inline-block; padding-bottom: 5px; }
-        label { display: flex; align-items: center; margin: 15px 0 8px; font-weight: bold; font-size: 15px; color: #34495e; }
+        label { display: flex; align-items: center; margin: 15px 0 8px; font-weight: bold; font-size: 15px; color: #34495e; justify-content: space-between;}
         input[type="checkbox"] { width: 20px; height: 20px; margin-right: 10px; }
         input[type="range"] { width: 100%; height: 8px; cursor: pointer; }
         .vector-box { display: inline-block; width: 16px; height: 16px; margin-right: 8px; border-radius: 4px; vertical-align: middle; }
         
         .highlight { color: #e74c3c; }
         .formula-box { margin-top: 15px; background-color: #e8f4f8; padding: 15px; border-radius: 8px; border-left: 5px solid #3498db; font-size: 1.1em; }
+        
+        .data-panel-c { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #2c3e50; padding: 15px; border-radius: 8px; color: white; margin-bottom: 20px;}
+        .data-item-c { display: flex; flex-direction: column; align-items: center; background: #34495e; padding: 10px; border-radius: 6px;}
+        .data-label-c { font-size: 12px; color: #bdc3c7; margin-bottom: 5px;}
+        .data-value-c { font-size: 18px; font-weight: bold; font-family: monospace; color: #f1c40f;}
     </style>
 </head>
 <body>
@@ -54,22 +59,29 @@
             <div class="card">
                 <h3 style="border:none; color: #e67e22; margin:0;">11. Sınıf</h3>
                 <h2 style="margin: 10px 0;">Manyetik Alan</h2>
-                <p>Düz tel ve çemberin oluşturduğu bileşke manyetik alanı inceleyin.</p>
+                <p>Düz tel ve çemberin oluşturduğu bileşke alanı inceleyin.</p>
                 <button class="btn" onclick="openSimulation('manyetizma')">Deneyi Başlat</button>
             </div>
 
             <div class="card">
                 <h3 style="border:none; color: #9b59b6; margin:0;">10. Sınıf</h3>
                 <h2 style="margin: 10px 0;">Dalga Mekaniği</h2>
-                <p>Dalga boyu, frekans ve hız ilişkisini formül üzerinden canlı gözlemleyin.</p>
+                <p>Dalga boyu, frekans ve hız ilişkisini gözlemleyin.</p>
                 <button class="btn" onclick="openSimulation('dalga')">Deneyi Başlat</button>
             </div>
 
             <div class="card">
                 <h3 style="border:none; color: #27ae60; margin:0;">11. Sınıf</h3>
                 <h2 style="margin: 10px 0;">Paralel Levhalar</h2>
-                <p>Hızlandırıcı ve yavaşlatıcı potansiyellerin yüklü parçacığa etkisini (iş-enerji) inceleyin.</p>
+                <p>Hızlandırıcı ve yavaşlatıcı potansiyellerin etkisini inceleyin.</p>
                 <button class="btn" onclick="openSimulation('levha')">Deneyi Başlat</button>
+            </div>
+
+            <div class="card">
+                <h3 style="border:none; color: #f39c12; margin:0;">11. Sınıf</h3>
+                <h2 style="margin: 10px 0;">Kondansatör (Sığaç)</h2>
+                <p>Levha alanı, mesafe ve dielektrik maddenin sığaya etkisini görün.</p>
+                <button class="btn" onclick="openSimulation('kondansator')">Deneyi Başlat</button>
             </div>
 
         </div>
@@ -122,11 +134,27 @@
                         <label style="display:block;">Yavaşlatıcı (V_dec): <span id="vdec-val" class="highlight">30</span> V</label>
                         <input type="range" id="Vdec" min="0" max="100" step="1" value="30">
                     </div>
-                    <div class="formula-box" style="font-size: 1rem;">
-                        <b style="color:#2c3e50;">Test Yükü (q):</b> 1 C <br>
-                        <b style="color:#2c3e50;">Kütle (m):</b> 10 kg
-                    </div>
                     <button id="btn_fire" class="btn" style="background-color: #27ae60; margin-top: 20px;">Parçacığı Fırlat</button>
+                </div>
+
+                <div id="panel_kondansator" class="panel" style="display: none;">
+                    <div class="data-panel-c">
+                        <div class="data-item-c"><span class="data-label-c">SIĞA (C)</span><span class="data-value-c" id="outC">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">YÜK (Q)</span><span class="data-value-c" id="outQ">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">ENERJİ (U)</span><span class="data-value-c" id="outU">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">E. ALAN (E)</span><span class="data-value-c" id="outE">0.00</span></div>
+                    </div>
+                    <div class="control-group" style="border:none; padding:0;">
+                        <label>Alan (A): <span id="valA" class="highlight">50</span></label>
+                        <input type="range" id="sliderA" min="10" max="100" value="50">
+                        <label>Mesafe (d): <span id="valD" class="highlight">20</span></label>
+                        <input type="range" id="sliderD" min="5" max="40" value="20">
+                        <label>Pil (V): <span id="valV" class="highlight">12</span>V</label>
+                        <input type="range" id="sliderV" min="0" max="24" value="12">
+                    </div>
+                    <div class="formula-box" style="margin-top: 10px;">
+                        <label style="color:#2c3e50; justify-content:flex-start;"><input type="checkbox" id="checkDielektrik"> Dielektrik Ekle (K=3)</label>
+                    </div>
                 </div>
 
             </div>
@@ -139,10 +167,7 @@
         let currentSimulation = ''; 
         let animasyonID; 
 
-        // ----------------- 1. MANYETİZMA -----------------
-        const K = 2500; 
         let cursor = { x: 350, y: 225 };
-
         function updateCursor(e) {
             const rect = canvas.getBoundingClientRect();
             let clientX = e.clientX || (e.touches && e.touches[0].clientX);
@@ -156,7 +181,15 @@
         canvas.addEventListener('mousemove', updateCursor);
         canvas.addEventListener('touchmove', (e) => { e.preventDefault(); updateCursor(e); }, {passive: false});
         canvas.addEventListener('touchstart', updateCursor, {passive: false});
+
+        const K_mag = 2500; 
         document.getElementById('sliderWire').addEventListener('input', () => { if(currentSimulation === 'manyetizma') drawManyetizma(); });
         document.getElementById('sliderLoop').addEventListener('input', () => { if(currentSimulation === 'manyetizma') drawManyetizma(); });
         document.getElementById('checkWire').addEventListener('change', () => { if(currentSimulation === 'manyetizma') drawManyetizma(); });
         document.getElementById('checkLoop').addEventListener('change', () => { if(currentSimulation === 'manyetizma') drawManyetizma(); });
+
+        function drawCurrentMark(x, y, val) {
+            ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill();
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2.5; ctx.stroke();
+            if(val > 0) { ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI*2); ctx.fillStyle = '#333'; ctx.fill(); } 
+            else if (val < 0) { ctx.beginPath(); ctx.moveTo(x-6, y-6); ctx.lineTo(x+6, y+6); ctx.moveTo(x+6
