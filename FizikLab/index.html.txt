@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>İnteraktif Fizik Laboratuvarı</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --bg-color: #f0f2f5;
+        }
+        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); margin: 0; color: #333; }
+        
+        .header { background: var(--primary-color); color: white; text-align: center; padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .quote { font-style: italic; color: #bdc3c7; font-size: 1.1rem; margin-top: 10px; }
+
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 20px; }
+        
+        .simulation-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 1.5rem; width: 300px; text-align: center; transition: transform 0.3s; }
+        .card:hover { transform: translateY(-5px); }
+        .btn { background-color: var(--primary-color); color: white; padding: 10px 20px; border-radius: 4px; border: none; cursor: pointer; margin-top: 15px; font-size: 16px; width: 100%; transition: background 0.3s; font-weight: bold; }
+        .btn:hover { background-color: var(--secondary-color); }
+
+        #simArea { display: none; }
+        .sim-layout { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; }
+        canvas { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: crosshair; touch-action: none; max-width: 100%; }
+        
+        .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 320px; box-sizing: border-box; }
+        .control-group { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        h3 { margin-top: 0; margin-bottom: 15px; color: var(--secondary-color); border-bottom: 2px solid var(--secondary-color); display: inline-block; padding-bottom: 5px; }
+        label { display: flex; align-items: center; margin: 15px 0 8px; font-weight: bold; font-size: 15px; color: #34495e; }
+        input[type="checkbox"] { width: 20px; height: 20px; margin-right: 10px; }
+        input[type="range"] { width: 100%; height: 8px; cursor: pointer; }
+        .vector-box { display: inline-block; width: 16px; height: 16px; margin-right: 8px; border-radius: 4px; vertical-align: middle; }
+        
+        .highlight { color: #e74c3c; }
+        .formula-box { margin-top: 15px; background-color: #e8f4f8; padding: 15px; border-radius: 8px; border-left: 5px solid #3498db; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>İnteraktif Fizik Laboratuvarı</h1>
+        <p class="quote">"Hayatta en hakiki mürşit ilimdir, fendir." - Mustafa Kemal Atatürk</p>
+    </div>
+
+    <div class="container">
+        
+        <div id="mainMenu" class="simulation-grid">
+            
+            <div class="card">
+                <h3 style="border:none; color: #e67e22; margin:0;">11. Sınıf</h3>
+                <h2 style="margin: 10px 0;">Manyetik Alan</h2>
+                <p>Düz tel ve çemberin oluşturduğu bileşke manyetik alanı inceleyin.</p>
+                <button class="btn" onclick="openSimulation('manyetizma')">Deneyi Başlat</button>
+            </div>
+
+            <div class="card">
+                <h3 style="border:none; color: #9b59b6; margin:0;">10. Sınıf</h3>
+                <h2 style="margin: 10px 0;">Dalga Mekaniği</h2>
+                <p>Dalga boyu, frekans ve hız ilişkisini formül üzerinden canlı gözlemleyin.</p>
+                <button class="btn" onclick="openSimulation('dalga')">Deneyi Başlat</button>
+            </div>
+
+            <div class="card">
+                <h3 style="border:none; color: #27ae60; margin:0;">11. Sınıf</h3>
+                <h2 style="margin: 10px 0;">Paralel Levhalar</h2>
+                <p>Hızlandırıcı ve yavaşlatıcı potansiyellerin yüklü parçacığa etkisini (iş-enerji) inceleyin.</p>
+                <button class="btn" onclick="openSimulation('levha')">Deneyi Başlat</button>
+            </div>
+
+        </div>
+
+        <div id="simArea">
+            <button class="btn" onclick="closeSimulation()" style="background-color: #e74c3c; margin-bottom: 20px; width: auto;">⬅ Ana Menüye Dön</button>
+            
+            <div class="sim-layout">
+                <canvas id="canvas" width="700" height="450"></canvas>
+                
+                <div id="panel_manyetizma" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Sistem Kontrolleri</h3>
+                        <label style="color: #2980b9;"><input type="checkbox" id="checkWire" checked> Düz Tel (Sol)</label>
+                        <input type="range" id="sliderWire" min="-10" max="10" value="6">
+                        
+                        <label style="color: #27ae60; margin-top: 25px;"><input type="checkbox" id="checkLoop" checked> Çember (Sağ)</label>
+                        <input type="range" id="sliderLoop" min="-10" max="10" value="6">
+                    </div>
+                    <div>
+                        <h3>Vektör Renkleri</h3>
+                        <div style="margin-bottom: 5px;"><span class="vector-box" style="background:#2980b9"></span> Telin Alanı</div>
+                        <div style="margin-bottom: 5px;"><span class="vector-box" style="background:#27ae60"></span> Çemberin Alanı</div>
+                        <div style="margin-top: 10px;"><span class="vector-box" style="background:#e74c3c"></span> <b>NET BİLEŞKE</b></div>
+                    </div>
+                </div>
+
+                <div id="panel_dalga" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Dalga Parametreleri</h3>
+                        <label style="display:block;">Frekans (f): <span id="freq-val" class="highlight">1.0</span> Hz</label>
+                        <input type="range" id="freq" min="0.1" max="5.0" step="0.1" value="1.0">
+                        <label style="display:block;">Dalga Boyu (λ): <span id="wave-val" class="highlight">100</span> px</label>
+                        <input type="range" id="wave" min="50" max="300" step="10" value="100">
+                        <label style="display:block;">Genlik (A): <span id="amp-val" class="highlight">50</span> px</label>
+                        <input type="range" id="amp" min="10" max="150" step="5" value="50">
+                    </div>
+                    <div class="formula-box">
+                        <b style="color:#2c3e50;">v = λ × f</b><br>
+                        Hız = <span id="speed-val" style="color:#27ae60; font-weight:bold;">100</span> px/s
+                    </div>
+                </div>
+
+                <div id="panel_levha" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Levha Potansiyelleri</h3>
+                        <label style="display:block;">Hızlandırıcı (V_acc): <span id="vacc-val" class="highlight">50</span> V</label>
+                        <input type="range" id="Vacc" min="0" max="100" step="1" value="50">
+                        
+                        <label style="display:block;">Yavaşlatıcı (V_dec): <span id="vdec-val" class="highlight">30</span> V</label>
+                        <input type="range" id="Vdec" min="0" max="100" step="1" value="30">
+                    </div>
+                    <div class="formula-box" style="font-size: 1rem;">
+                        <b style="color:#2c3e50;">Test Yükü (q):</b> 1 C <br>
+                        <b style="color:#2c3e50;">Kütle (m):</b> 10 kg
+                    </div>
+                    <button id="btn_fire" class="btn" style="background-color: #27ae60; margin-top: 20px;">Parçacığı Fırlat</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let currentSimulation = ''; 
+        let animasyonID; 
+
+        // ----------------- 1. MANYETİZMA -----------------
+        const K = 2500; 
+        let cursor = { x: 350, y: 225 };
+
+        function updateCursor(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            if(clientX && clientY) {
+                cursor.x = clientX - rect.left;
+                cursor.y = clientY - rect.top;
+                if(currentSimulation === 'manyetizma') drawManyetizma();
+            }
+        }
+        canvas.addEventListener('mousemove', updateCursor);
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); updateCursor(e); }, {passive: false});
+        canvas.addEventListener('touchstart', updateCursor, {passive: false});
+        document.getElementById('sliderWire').addEventListener('input', () => { if(currentSimulation === 'manyetizma') drawManyetizma(); });
+        document.getElementById('sliderLoop').addEventListener('input', () => { if(currentSimulation === 'manyetizma') drawManyetizma(); });
+        document.getElementById('checkWire').addEventListener('change', () => { if(currentSimulation === 'manyetizma') drawManyetizma(); });
+        document.getElementById('checkLoop').addEventListener('change', () => { if(currentSimulation === 'manyetizma') drawManyetizma(); });
