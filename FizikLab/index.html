@@ -192,4 +192,205 @@
             ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill();
             ctx.strokeStyle = '#333'; ctx.lineWidth = 2.5; ctx.stroke();
             if(val > 0) { ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI*2); ctx.fillStyle = '#333'; ctx.fill(); } 
-            else if (val < 0) { ctx.beginPath(); ctx.moveTo(x-6, y-6); ctx.lineTo(x+6, y+6); ctx.moveTo(x+6
+            else if (val < 0) { ctx.beginPath(); ctx.moveTo(x-6, y-6); ctx.lineTo(x+6, y+6); ctx.moveTo(x+6, y-6); ctx.lineTo(x-6, y+6); ctx.stroke(); }
+        }
+        function drawArrow(x, y, vx, vy, color, width) {
+            let len = Math.sqrt(vx*vx + vy*vy); if (len < 1) return;
+            let maxLen = 150; let scale = len > maxLen ? maxLen / len : 1; vx *= scale; vy *= scale;
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + vx, y + vy); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.stroke();
+            const angle = Math.atan2(vy, vx); ctx.save(); ctx.translate(x + vx, y + vy); ctx.rotate(angle);
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-12, 6); ctx.lineTo(-12, -6); ctx.fillStyle = color; ctx.fill(); ctx.restore();
+        }
+        function drawManyetizma() {
+            ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,canvas.width, canvas.height); 
+            const iW = parseFloat(document.getElementById('sliderWire').value);
+            const iL = parseFloat(document.getElementById('sliderLoop').value);
+            const showWire = document.getElementById('checkWire').checked;
+            const showLoop = document.getElementById('checkLoop').checked;
+            let netB = { x: 0, y: 0 }, bWire = { x: 0, y: 0 }, bLoop = { x: 0, y: 0 };
+
+            if(showWire && iW !== 0) {
+                drawCurrentMark(200, 225, iW); ctx.fillStyle = "#7f8c8d"; ctx.font = "14px Arial"; ctx.fillText("Düz Tel", 175, 260);
+                let dx = cursor.x - 200, dy = cursor.y - 225, r2 = dx*dx + dy*dy;
+                if(r2 > 150) { bWire = { x: K_mag * iW * dy / r2, y: -K_mag * iW * dx / r2 }; netB.x += bWire.x; netB.y += bWire.y; }
+            } else if (showWire) drawCurrentMark(200, 225, 0);
+
+            if(showLoop) {
+                ctx.beginPath(); ctx.ellipse(500, 225, 30, 80, 0, 0, Math.PI*2); ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 2; ctx.stroke();
+                ctx.fillStyle = "#7f8c8d"; ctx.font = "14px Arial"; ctx.fillText("Çember", 475, 335);
+                if(iL !== 0) {
+                    drawCurrentMark(500, 145, iL); drawCurrentMark(500, 305, -iL);
+                    [[500, 145, iL], [500, 305, -iL]].forEach(src => {
+                        let dx = cursor.x - src[0], dy = cursor.y - src[1], r2 = dx*dx + dy*dy;
+                        if(r2 > 150) { bLoop.x += K_mag * src[2] * dy / r2; bLoop.y += -K_mag * src[2] * dx / r2; }
+                    });
+                    netB.x += bLoop.x; netB.y += bLoop.y;
+                } else { drawCurrentMark(500, 145, 0); drawCurrentMark(500, 305, 0); }
+            }
+            ctx.beginPath(); ctx.arc(cursor.x, cursor.y, 5, 0, Math.PI*2); ctx.fillStyle = '#e74c3c'; ctx.fill();
+            if(showWire) drawArrow(cursor.x, cursor.y, bWire.x, bWire.y, '#2980b9', 3);
+            if(showLoop) drawArrow(cursor.x, cursor.y, bLoop.x, bLoop.y, '#27ae60', 3);
+            if((showWire && iW !== 0) || (showLoop && iL !== 0)) drawArrow(cursor.x, cursor.y, netB.x, netB.y, '#e74c3c', 5);
+        }
+
+        let particle = { x: 100, v: 0, running: false };
+
+        function openSimulation(simId) {
+            currentSimulation = simId;
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('simArea').style.display = 'block';
+            
+            document.getElementById('panel_manyetizma').style.display = 'none';
+            document.getElementById('panel_dalga').style.display = 'none';
+            document.getElementById('panel_levha').style.display = 'none';
+            document.getElementById('panel_kondansator').style.display = 'none';
+
+            if (animasyonID) cancelAnimationFrame(animasyonID);
+
+            if(simId === 'kondansator') { canvas.style.background = '#1e1e24'; } 
+            else { canvas.style.background = '#ffffff'; }
+
+            if(simId === 'manyetizma') {
+                document.getElementById('panel_manyetizma').style.display = 'block';
+                drawManyetizma(); 
+            }
+            else if(simId === 'dalga') {
+                document.getElementById('panel_dalga').style.display = 'block';
+                const freqSlider = document.getElementById('freq'), waveSlider = document.getElementById('wave'), ampSlider = document.getElementById('amp');
+                const freqVal = document.getElementById('freq-val'), waveVal = document.getElementById('wave-val'), ampVal = document.getElementById('amp-val'), speedVal = document.getElementById('speed-val');
+                let time = 0, lastTime = performance.now();
+
+                function cizDalga() {
+                    let currentTime = performance.now(), dt = (currentTime - lastTime) / 1000;
+                    lastTime = currentTime; time += dt;
+                    let f = parseFloat(freqSlider.value), lambda = parseFloat(waveSlider.value), A = parseFloat(ampSlider.value), v = f * lambda;
+                    freqVal.innerText = f.toFixed(1); waveVal.innerText = lambda; ampVal.innerText = A; speedVal.innerText = v.toFixed(1);
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.beginPath(); ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
+                    ctx.strokeStyle = '#bdc3c7'; ctx.setLineDash([5, 5]); ctx.stroke(); ctx.setLineDash([]);
+                    ctx.beginPath(); ctx.strokeStyle = '#3498db'; ctx.lineWidth = 4;
+                    for (let x = 0; x < canvas.width; x++) {
+                        let y = canvas.height / 2 - A * Math.sin(2 * Math.PI * (x / lambda - f * time));
+                        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    animasyonID = requestAnimationFrame(cizDalga);
+                }
+                cizDalga();
+            }
+            else if(simId === 'levha') {
+                document.getElementById('panel_levha').style.display = 'block';
+                const vaccSlider = document.getElementById('Vacc'), vdecSlider = document.getElementById('Vdec');
+                const vaccVal = document.getElementById('vacc-val'), vdecVal = document.getElementById('vdec-val');
+                
+                particle = { x: 100, v: 0, running: false };
+                document.getElementById('btn_fire').onclick = () => { particle.x = 100; particle.v = 0; particle.running = true; };
+
+                function cizLevha() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    let V_acc = parseFloat(vaccSlider.value), V_dec = parseFloat(vdecSlider.value);
+                    vaccVal.innerText = V_acc; vdecVal.innerText = V_dec;
+
+                    let q = 1.0, m = 10.0, d = 1.0; 
+                    let a1 = (q * V_acc) / (m * d); let v1_max = Math.sqrt(2 * a1 * d); let a2 = (q * V_dec) / (m * d);
+                    let K_acc = 0.5 * m * (v1_max * v1_max); let K_son = K_acc - (q * V_dec);
+                    let v2_son = (K_son >= 0) ? Math.sqrt(2 * K_son / m) : 0;
+
+                    ctx.fillStyle = 'rgba(46, 204, 113, 0.1)'; ctx.fillRect(100, 0, 250, 450); 
+                    ctx.fillStyle = 'rgba(231, 76, 60, 0.1)'; ctx.fillRect(350, 0, 250, 450); 
+
+                    ctx.fillStyle = '#7f8c8d';
+                    ctx.fillRect(95, 125, 10, 200); ctx.fillRect(345, 125, 10, 200); ctx.fillRect(595, 125, 10, 200); 
+                    
+                    ctx.font = '16px Arial'; ctx.fillStyle = '#2c3e50';
+                    ctx.fillText(`+${V_acc}V`, 80, 110); ctx.fillText(`0V`, 345, 110); ctx.fillText(`+${V_dec}V`, 585, 110);
+                    ctx.font = '15px Consolas, monospace';
+                    ctx.fillText(`[BÖLGE 1] İvme(a1): ${a1.toFixed(2)} | V_max: ${v1_max.toFixed(2)}`, 110, 360);
+                    let bolge2_durum = K_son < 0 ? "GERİ DÖNER!" : `V_son: ${v2_son.toFixed(2)}`;
+                    ctx.fillText(`[BÖLGE 2] İvme(a2): -${a2.toFixed(2)} | Durum: ${bolge2_durum}`, 110, 390);
+
+                    ctx.beginPath(); ctx.arc(particle.x, 225, 12, 0, Math.PI * 2); ctx.fillStyle = '#e74c3c'; ctx.fill();
+                    ctx.fillStyle = 'white'; ctx.font = '14px Arial'; ctx.fillText('+', particle.x - 4, 230);
+
+                    if(particle.running) {
+                        let dt = 0.2; 
+                        if(particle.x >= 100 && particle.x < 350) particle.v += a1 * dt; 
+                        else if(particle.x >= 350 && particle.x <= 600) particle.v -= a2 * dt; 
+                        particle.x += particle.v;
+                        if(particle.x >= 600) { particle.x = 600; particle.v = 0; particle.running = false; }
+                        else if(particle.x <= 100 && particle.v < 0) { particle.x = 100; particle.v = 0; particle.running = false; }
+                    }
+                    animasyonID = requestAnimationFrame(cizLevha);
+                }
+                cizLevha();
+            }
+            else if(simId === 'kondansator') {
+                document.getElementById('panel_kondansator').style.display = 'block';
+                const sA = document.getElementById('sliderA'), sD = document.getElementById('sliderD'), sV = document.getElementById('sliderV'), cDie = document.getElementById('checkDielektrik');
+                const vA = document.getElementById('valA'), vD = document.getElementById('valD'), vV = document.getElementById('valV');
+                const oC = document.getElementById('outC'), oQ = document.getElementById('outQ'), oU = document.getElementById('outU'), oE = document.getElementById('outE');
+                let t_alan = 0;
+
+                function cizKondansator() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    let A = parseFloat(sA.value), d = parseFloat(sD.value), V = parseFloat(sV.value), K_die = cDie.checked ? 3 : 1;
+                    vA.innerText = A; vD.innerText = d; vV.innerText = V;
+
+                    let epsilon0 = 8.85; 
+                    let C = (K_die * epsilon0 * A) / d, Q = C * V, U = 0.5 * C * (V * V), E = V / d;
+                    oC.innerText = C.toFixed(2); oQ.innerText = Q.toFixed(2); oU.innerText = U.toFixed(2); oE.innerText = E.toFixed(2);
+
+                    let levhaBoyu = 100 + (A * 2), levhaAraligi = d * 5;
+                    let merkezY = canvas.height / 2, solX = canvas.width/2 - levhaAraligi/2, sagX = canvas.width/2 + levhaAraligi/2, ustY = merkezY - levhaBoyu/2;
+
+                    if(K_die > 1) {
+                        ctx.fillStyle = 'rgba(52, 152, 219, 0.3)'; ctx.fillRect(solX, ustY, levhaAraligi, levhaBoyu);
+                        ctx.fillStyle = 'rgba(52, 152, 219, 0.8)'; ctx.font = '16px Arial'; ctx.fillText("K=3", canvas.width/2 - 15, merkezY);
+                    }
+
+                    ctx.strokeStyle = '#555'; ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.moveTo(solX, merkezY); ctx.lineTo(solX - 100, merkezY); ctx.lineTo(solX - 100, 400); 
+                    ctx.moveTo(sagX, merkezY); ctx.lineTo(sagX + 100, merkezY); ctx.lineTo(sagX + 100, 400); ctx.stroke();
+
+                    ctx.fillStyle = '#2c3e50'; ctx.fillRect(solX - 120, 380, sagX - solX + 240, 40);
+                    ctx.fillStyle = '#e74c3c'; ctx.fillRect(solX - 105, 385, 20, 30); 
+                    ctx.fillStyle = '#3498db'; ctx.fillRect(sagX + 85, 385, 20, 30);  
+                    ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.fillText(`${V} Volt Pil`, canvas.width/2 - 40, 405);
+
+                    ctx.fillStyle = '#e74c3c'; ctx.fillRect(solX - 10, ustY, 10, levhaBoyu);
+                    ctx.fillStyle = '#3498db'; ctx.fillRect(sagX, ustY, 10, levhaBoyu);
+
+                    if(V > 0) {
+                        let yukSayisi = Math.min(Math.floor(Q / 50), 20), adim = levhaBoyu / (yukSayisi + 1);
+                        ctx.fillStyle = '#fff'; ctx.font = '14px Arial';
+                        for(let i=1; i<=yukSayisi; i++) { ctx.fillText('+', solX - 25, ustY + (i*adim) + 5); ctx.fillText('-', sagX + 15, ustY + (i*adim) + 4); }
+
+                        let cizgiSayisi = Math.min(Math.floor(E * 5), 15), cizgiAdim = levhaBoyu / (cizgiSayisi + 1);
+                        ctx.strokeStyle = 'rgba(231, 76, 60, 0.6)'; ctx.lineWidth = 1.5; t_alan += 0.5; 
+                        
+                        for(let i=1; i<=cizgiSayisi; i++) {
+                            let cY = ustY + (i*cizgiAdim);
+                            ctx.beginPath(); ctx.moveTo(solX, cY); ctx.lineTo(sagX, cY); ctx.stroke();
+                            let okX = solX + ((t_alan + i*10) % levhaAraligi); 
+                            if(okX > solX && okX < sagX) {
+                                ctx.beginPath(); ctx.moveTo(okX, cY); ctx.lineTo(okX - 6, cY - 4); ctx.lineTo(okX - 6, cY + 4); 
+                                ctx.fillStyle = 'rgba(231, 76, 60, 0.8)'; ctx.fill();
+                            }
+                        }
+                    }
+                    animasyonID = requestAnimationFrame(cizKondansator);
+                }
+                cizKondansator();
+            }
+        }
+
+        function closeSimulation() {
+            currentSimulation = '';
+            if (animasyonID) cancelAnimationFrame(animasyonID); 
+            document.getElementById('mainMenu').style.display = 'flex';
+            document.getElementById('simArea').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
