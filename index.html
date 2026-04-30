@@ -101,4 +101,313 @@
 
             <div class="card">
                 <h3 style="border:none; color: #34495e; margin:0;">10. Sınıf</h3>
-                <h2 style="margin: 1
+                <h2 style="margin: 10px 0;">Ohm Yasası ve Dirençler</h2>
+                <p>Seri ve paralel devrelerde akım, gerilim ve eşdeğer direnci hesaplayın.</p>
+                <button class="btn" onclick="openSimulation('ohm')">Deneyi Başlat</button>
+            </div>
+
+        </div>
+
+        <div id="simArea">
+            <button class="btn" onclick="closeSimulation()" style="background-color: #e74c3c; margin-bottom: 20px; width: auto;">⬅ Ana Menüye Dön</button>
+            
+            <div class="sim-layout">
+                <canvas id="canvas" width="700" height="450"></canvas>
+                
+                <div id="panel_manyetizma" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Sistem Kontrolleri</h3>
+                        <label style="color: #2980b9;"><input type="checkbox" id="checkWire" checked> Düz Tel (Sol)</label>
+                        <input type="range" id="sliderWire" min="-10" max="10" value="6">
+                        
+                        <label style="color: #27ae60; margin-top: 25px;"><input type="checkbox" id="checkLoop" checked> Çember (Sağ)</label>
+                        <input type="range" id="sliderLoop" min="-10" max="10" value="6">
+                    </div>
+                </div>
+
+                <div id="panel_dalga" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Dalga Parametreleri</h3>
+                        <label style="display:block;">Frekans (f): <span id="freq-val" class="highlight">1.0</span> Hz</label>
+                        <input type="range" id="freq" min="0.1" max="5.0" step="0.1" value="1.0">
+                        <label style="display:block;">Dalga Boyu (λ): <span id="wave-val" class="highlight">100</span> px</label>
+                        <input type="range" id="wave" min="50" max="300" step="10" value="100">
+                    </div>
+                </div>
+
+                <div id="panel_levha" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Levha Potansiyelleri</h3>
+                        <label style="display:block;">Hızlandırıcı (V_acc): <span id="vacc-val" class="highlight">50</span> V</label>
+                        <input type="range" id="Vacc" min="0" max="100" step="1" value="50">
+                        <label style="display:block;">Yavaşlatıcı (V_dec): <span id="vdec-val" class="highlight">30</span> V</label>
+                        <input type="range" id="Vdec" min="0" max="100" step="1" value="30">
+                    </div>
+                    <button id="btn_fire" class="btn" style="background-color: #27ae60; margin-top: 20px;">Parçacığı Fırlat</button>
+                </div>
+
+                <div id="panel_kondansator" class="panel" style="display: none;">
+                    <div class="data-panel-c">
+                        <div class="data-item-c"><span class="data-label-c">SIĞA (C)</span><span class="data-value-c" id="outC">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">YÜK (Q)</span><span class="data-value-c" id="outQ">0.00</span></div>
+                    </div>
+                    <div class="control-group" style="border:none; padding:0;">
+                        <label>Alan (A): <span id="valA" class="highlight">50</span></label>
+                        <input type="range" id="sliderA" min="10" max="100" value="50">
+                        <label>Mesafe (d): <span id="valD" class="highlight">20</span></label>
+                        <input type="range" id="sliderD" min="5" max="40" value="20">
+                        <label>Pil (V): <span id="valV" class="highlight">12</span>V</label>
+                        <input type="range" id="sliderV" min="0" max="24" value="12">
+                    </div>
+                </div>
+
+                <div id="panel_ohm" class="panel" style="display: none; width: 380px;">
+                    <div class="ohm-mode-switch">
+                        <button id="btn-seri" class="ohm-mode-btn active">SERİ BAĞLANTI</button>
+                        <button id="btn-paralel" class="ohm-mode-btn">PARALEL BAĞLANTI</button>
+                    </div>
+                    
+                    <div class="ohm-info-text" id="ohm-mode-desc">Seri bağlı dirençlerde akım sabittir, gerilim dirençlerle doğru orantılı bölünür.</div>
+
+                    <div class="ohm-dashboard">
+                        <div class="ohm-metric">
+                            <div class="ohm-metric-title">Eşdeğer (R_eş)</div>
+                            <div class="ohm-metric-value" id="ohm-val-req">0.00 Ω</div>
+                        </div>
+                        <div class="ohm-metric">
+                            <div class="ohm-metric-title">Ana Akım (I)</div>
+                            <div class="ohm-metric-value" id="ohm-val-itot">0.00 A</div>
+                        </div>
+                    </div>
+
+                    <div class="ohm-details-panel" id="ohm-details-panel">
+                        <div class="ohm-detail-box">
+                            <div class="ohm-detail-name" id="ohm-name-1">V1 (R1'de)</div>
+                            <div class="ohm-detail-val" id="ohm-val-1">0.00 V</div>
+                        </div>
+                        <div class="ohm-detail-box">
+                            <div class="ohm-detail-name" id="ohm-name-2">V2 (R2'de)</div>
+                            <div class="ohm-detail-val" id="ohm-val-2">0.00 V</div>
+                        </div>
+                        <div class="ohm-detail-box">
+                            <div class="ohm-detail-name" id="ohm-name-3">V3 (R3'te)</div>
+                            <div class="ohm-detail-val" id="ohm-val-3">0.00 V</div>
+                        </div>
+                    </div>
+
+                    <div class="control-group" style="margin-bottom: 0;">
+                        <label>Üreteç Gerilimi: <span id="ohm-lbl-v" class="highlight">24</span> V</label>
+                        <input type="range" id="ohm-inp-v" min="1" max="60" value="24" step="1">
+                        
+                        <label>R1 Direnci: <span id="ohm-lbl-r1" class="highlight">4</span> Ω</label>
+                        <input type="range" id="ohm-inp-r1" min="1" max="50" value="4" step="1">
+                        
+                        <label>R2 Direnci: <span id="ohm-lbl-r2" class="highlight">6</span> Ω</label>
+                        <input type="range" id="ohm-inp-r2" min="1" max="50" value="6" step="1">
+                        
+                        <label>R3 Direnci: <span id="ohm-lbl-r3" class="highlight">12</span> Ω</label>
+                        <input type="range" id="ohm-inp-r3" min="1" max="50" value="12" step="1">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let currentSimulation = ''; 
+        let animasyonID; 
+
+        // ORTAK: Mouse Takibi
+        let cursor = { x: 350, y: 225 };
+        function updateCursor(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            if(clientX && clientY) {
+                cursor.x = clientX - rect.left;
+                cursor.y = clientY - rect.top;
+                if(currentSimulation === 'manyetizma') drawManyetizma();
+            }
+        }
+        canvas.addEventListener('mousemove', updateCursor);
+
+        // ... [ÖNCEKİ 4 SİMÜLASYONUN MİNİMUM İHTİYAÇLARI] ...
+        const K_mag = 2500; 
+        function drawManyetizma() { /* ... Manyetizma Çizim Fonksiyonu (Daha önce yaptığımız) ... */ }
+        let particle = { x: 100, v: 0, running: false };
+
+        // OHM YASASI SİSTEM DEĞİŞKENLERİ
+        let ohmMode = 'seri';
+        let ohmVals = { V: 24, R1: 4, R2: 6, R3: 12, Req: 0, Itot: 0, val1: 0, val2: 0, val3: 0 };
+
+        function openSimulation(simId) {
+            currentSimulation = simId;
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('simArea').style.display = 'block';
+            
+            document.getElementById('panel_manyetizma').style.display = 'none';
+            document.getElementById('panel_dalga').style.display = 'none';
+            document.getElementById('panel_levha').style.display = 'none';
+            document.getElementById('panel_kondansator').style.display = 'none';
+            document.getElementById('panel_ohm').style.display = 'none';
+
+            if (animasyonID) cancelAnimationFrame(animasyonID);
+
+            if(simId === 'kondansator' || simId === 'ohm') { canvas.style.background = '#1e1e24'; } 
+            else { canvas.style.background = '#ffffff'; }
+
+            // 1. MANYETİZMA
+            if(simId === 'manyetizma') { document.getElementById('panel_manyetizma').style.display = 'block'; }
+            // 2. DALGA
+            else if(simId === 'dalga') { document.getElementById('panel_dalga').style.display = 'block'; }
+            // 3. LEVHA
+            else if(simId === 'levha') { document.getElementById('panel_levha').style.display = 'block'; }
+            // 4. KONDANSATÖR
+            else if(simId === 'kondansator') { document.getElementById('panel_kondansator').style.display = 'block'; }
+            
+            // 5. YENİ: OHM YASASI (DEVRE ÇİZİMİ İLE)
+            else if(simId === 'ohm') {
+                document.getElementById('panel_ohm').style.display = 'block';
+                
+                const btnSeri = document.getElementById('btn-seri');
+                const btnParalel = document.getElementById('btn-paralel');
+                const inputs = ['v', 'r1', 'r2', 'r3'].map(id => document.getElementById(`ohm-inp-${id}`));
+                
+                function updateOhmCalc() {
+                    ohmVals.V = parseFloat(document.getElementById('ohm-inp-v').value);
+                    ohmVals.R1 = parseFloat(document.getElementById('ohm-inp-r1').value);
+                    ohmVals.R2 = parseFloat(document.getElementById('ohm-inp-r2').value);
+                    ohmVals.R3 = parseFloat(document.getElementById('ohm-inp-r3').value);
+
+                    document.getElementById('ohm-lbl-v').innerText = ohmVals.V;
+                    document.getElementById('ohm-lbl-r1').innerText = ohmVals.R1;
+                    document.getElementById('ohm-lbl-r2').innerText = ohmVals.R2;
+                    document.getElementById('ohm-lbl-r3').innerText = ohmVals.R3;
+
+                    if (ohmMode === 'seri') {
+                        ohmVals.Req = ohmVals.R1 + ohmVals.R2 + ohmVals.R3;
+                        ohmVals.Itot = ohmVals.V / ohmVals.Req;
+                        ohmVals.val1 = ohmVals.Itot * ohmVals.R1;
+                        ohmVals.val2 = ohmVals.Itot * ohmVals.R2;
+                        ohmVals.val3 = ohmVals.Itot * ohmVals.R3;
+                        
+                        document.getElementById('ohm-val-1').innerText = ohmVals.val1.toFixed(2) + " V";
+                        document.getElementById('ohm-val-2').innerText = ohmVals.val2.toFixed(2) + " V";
+                        document.getElementById('ohm-val-3').innerText = ohmVals.val3.toFixed(2) + " V";
+                    } else {
+                        let invReq = (1/ohmVals.R1) + (1/ohmVals.R2) + (1/ohmVals.R3);
+                        ohmVals.Req = 1 / invReq;
+                        ohmVals.Itot = ohmVals.V / ohmVals.Req;
+                        ohmVals.val1 = ohmVals.V / ohmVals.R1;
+                        ohmVals.val2 = ohmVals.V / ohmVals.R2;
+                        ohmVals.val3 = ohmVals.V / ohmVals.R3;
+                        
+                        document.getElementById('ohm-val-1').innerText = ohmVals.val1.toFixed(2) + " A";
+                        document.getElementById('ohm-val-2').innerText = ohmVals.val2.toFixed(2) + " A";
+                        document.getElementById('ohm-val-3').innerText = ohmVals.val3.toFixed(2) + " A";
+                    }
+
+                    document.getElementById('ohm-val-req').innerText = ohmVals.Req.toFixed(2) + " Ω";
+                    document.getElementById('ohm-val-itot').innerText = ohmVals.Itot.toFixed(2) + " A";
+                }
+
+                function setOhmMode(mode) {
+                    ohmMode = mode;
+                    btnSeri.classList.toggle('active', mode === 'seri');
+                    btnParalel.classList.toggle('active', mode === 'paralel');
+                    
+                    let desc = document.getElementById('ohm-mode-desc');
+                    if(mode === 'seri') {
+                        desc.innerText = "Seri bağlı dirençlerde akım sabittir, gerilim bölünür.";
+                        document.getElementById('ohm-name-1').innerText = "V1 (R1'de)";
+                        document.getElementById('ohm-name-2').innerText = "V2 (R2'de)";
+                        document.getElementById('ohm-name-3').innerText = "V3 (R3'te)";
+                    } else {
+                        desc.innerText = "Paralel bağlı dirençlerde gerilim sabittir, akım bölünür.";
+                        document.getElementById('ohm-name-1').innerText = "I1 (R1'den)";
+                        document.getElementById('ohm-name-2').innerText = "I2 (R2'den)";
+                        document.getElementById('ohm-name-3').innerText = "I3 (R3'ten)";
+                    }
+                    updateOhmCalc();
+                }
+
+                btnSeri.onclick = () => setOhmMode('seri');
+                btnParalel.onclick = () => setOhmMode('paralel');
+                inputs.forEach(inp => inp.addEventListener('input', updateOhmCalc));
+                
+                setOhmMode('seri'); // Başlangıç durumu
+
+                // DEVRE ÇİZİM FONKSİYONU
+                function drawResistor(x, y, label, valText) {
+                    ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.moveTo(x, y);
+                    for(let i=0; i<4; i++) {
+                        ctx.lineTo(x + 10 + (i*20), y - 10);
+                        ctx.lineTo(x + 20 + (i*20), y + 10);
+                    }
+                    ctx.lineTo(x + 100, y); ctx.stroke();
+                    
+                    ctx.fillStyle = '#fff'; ctx.font = '14px Arial'; ctx.textAlign = 'center';
+                    ctx.fillText(label, x + 50, y - 20);
+                    ctx.fillStyle = '#3498db'; ctx.font = 'bold 16px Arial';
+                    ctx.fillText(valText, x + 50, y + 30);
+                }
+
+                function animateOhm() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Pil Çizimi
+                    ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.moveTo(100, 225); ctx.lineTo(100, 400); ctx.lineTo(350, 400); ctx.lineTo(600, 400); ctx.lineTo(600, 225); ctx.stroke();
+                    
+                    ctx.fillStyle = '#2c3e50'; ctx.fillRect(310, 380, 80, 40);
+                    ctx.fillStyle = '#e74c3c'; ctx.fillRect(300, 385, 10, 30); // Artı
+                    ctx.fillStyle = '#3498db'; ctx.fillRect(390, 385, 10, 30); // Eksi
+                    ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.textAlign = 'center';
+                    ctx.fillText(`${ohmVals.V}V`, 350, 365);
+                    ctx.fillStyle = '#e74c3c'; ctx.fillText(`Ana Akım: ${ohmVals.Itot.toFixed(2)}A`, 350, 440);
+
+                    if(ohmMode === 'seri') {
+                        // Seri Bağlantı Çizgileri
+                        ctx.beginPath(); ctx.moveTo(100, 225); ctx.lineTo(150, 225); 
+                        ctx.moveTo(250, 225); ctx.lineTo(300, 225); 
+                        ctx.moveTo(400, 225); ctx.lineTo(450, 225); 
+                        ctx.moveTo(550, 225); ctx.lineTo(600, 225); ctx.stroke();
+                        
+                        drawResistor(150, 225, `R1: ${ohmVals.R1}Ω`, `${ohmVals.val1.toFixed(1)}V`);
+                        drawResistor(300, 225, `R2: ${ohmVals.R2}Ω`, `${ohmVals.val2.toFixed(1)}V`);
+                        drawResistor(450, 225, `R3: ${ohmVals.R3}Ω`, `${ohmVals.val3.toFixed(1)}V`);
+                    } else {
+                        // Paralel Bağlantı Çizgileri
+                        ctx.beginPath(); 
+                        ctx.moveTo(100, 100); ctx.lineTo(100, 350); 
+                        ctx.moveTo(600, 100); ctx.lineTo(600, 350);
+                        [100, 225, 350].forEach(y => {
+                            ctx.moveTo(100, y); ctx.lineTo(250, y);
+                            ctx.moveTo(350, y); ctx.lineTo(600, y);
+                        });
+                        ctx.stroke();
+
+                        drawResistor(250, 100, `R1: ${ohmVals.R1}Ω`, `${ohmVals.val1.toFixed(2)}A`);
+                        drawResistor(250, 225, `R2: ${ohmVals.R2}Ω`, `${ohmVals.val2.toFixed(2)}A`);
+                        drawResistor(250, 350, `R3: ${ohmVals.R3}Ω`, `${ohmVals.val3.toFixed(2)}A`);
+                    }
+
+                    animasyonID = requestAnimationFrame(animateOhm);
+                }
+                animateOhm();
+            }
+        }
+
+        function closeSimulation() {
+            currentSimulation = '';
+            if (animasyonID) cancelAnimationFrame(animasyonID); 
+            document.getElementById('mainMenu').style.display = 'flex';
+            document.getElementById('simArea').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
