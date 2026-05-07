@@ -87,4 +87,1030 @@
                 <button class="btn" onclick="openSimulation('ohm')">Deneyi Başlat</button>
             </div>
             <div class="card">
-                <h3 style="border:none; color: #c
+                <h3 style="border:none; color: #c0392b; margin:0;">10. Sınıf</h3><h2 style="margin: 10px 0;">Üreteçler</h2>
+                <p>Pillerin bağlanma şekli ve lamba parlaklığı.</p>
+                <button class="btn" onclick="openSimulation('uretec')">Deneyi Başlat</button>
+            </div>
+            <div class="card">
+                <h3 style="border:none; color: #2980b9; margin:0;">11. Sınıf</h3><h2 style="margin: 10px 0;">Akım Makarası</h2>
+                <p>Manyetik alan çizgilerini ve pusula yönelimini keşfedin.</p>
+                <button class="btn" onclick="openSimulation('selenoid')">Deneyi Başlat</button>
+            </div>
+            <div class="card">
+                <h3 style="border:none; color: #8e44ad; margin:0;">10. Sınıf</h3><h2 style="margin: 10px 0;">Renk ve Işık</h2>
+                <p>Işık renginin cisimlerin görünürlüğüne ve kamuflaja etkisini inceleyin.</p>
+                <button class="btn" style="background-color: #8e44ad;" onclick="openSimulation('renk')">Deneyi Başlat</button>
+            </div>
+        </div>
+
+        <div id="simArea">
+            <button class="btn" onclick="closeSimulation()" style="background-color: #e74c3c; margin-bottom: 20px; width: auto;">⬅ Ana Menüye Dön</button>
+            
+            <div class="sim-layout">
+                <canvas id="canvas" width="750" height="450"></canvas>
+                
+                <div id="panel_manyetizma" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Sistem Kontrolleri</h3>
+                        <label style="color: #2980b9;"><input type="checkbox" id="checkWire" checked> Düz Tel (Sol)</label>
+                        <input type="range" id="sliderWire" min="-10" max="10" value="6">
+                        <label style="color: #27ae60; margin-top: 25px;"><input type="checkbox" id="checkLoop" checked> Çember (Sağ)</label>
+                        <input type="range" id="sliderLoop" min="-10" max="10" value="6">
+                    </div>
+                </div>
+
+                <div id="panel_dalga" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Dalga Parametreleri</h3>
+                        <label>Frekans (f): <span id="freq-val" class="highlight">1.0</span> Hz</label>
+                        <input type="range" id="freq" min="0.1" max="5.0" step="0.1" value="1.0">
+                        <label>Dalga Boyu (λ): <span id="wave-val" class="highlight">100</span> px</label>
+                        <input type="range" id="wave" min="50" max="300" step="10" value="100">
+                        <label>Genlik (A): <span id="amp-val" class="highlight">50</span> px</label>
+                        <input type="range" id="amp" min="10" max="150" step="5" value="50">
+                    </div>
+                    <div class="formula-box">
+                        <b style="color:#2c3e50;">v = λ × f</b><br>
+                        Hız = <span id="speed-val" style="color:#27ae60; font-weight:bold;">100</span> px/s
+                    </div>
+                </div>
+
+                <div id="panel_levha" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Levha Potansiyelleri</h3>
+                        <label>Hızlandırıcı (V1): <span id="vacc-val" class="highlight">50</span> V</label>
+                        <input type="range" id="Vacc" min="0" max="100" step="1" value="50">
+                        <label>Yavaşlatıcı (V2): <span id="vdec-val" class="highlight">30</span> V</label>
+                        <input type="range" id="Vdec" min="0" max="100" step="1" value="30">
+                    </div>
+                    <button id="btn_fire" class="btn" style="background-color: #27ae60; margin-top: 20px;">Parçacığı Fırlat</button>
+                </div>
+
+                <div id="panel_kondansator" class="panel" style="display: none;">
+                    <div class="data-panel-c">
+                        <div class="data-item-c"><span class="data-label-c">SIĞA (C)</span><span class="data-value-c" id="outC">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">YÜK (Q)</span><span class="data-value-c" id="outQ">0.00</span></div>
+                    </div>
+                    <div class="control-group" style="border:none; padding:0;">
+                        <label>Alan (A): <span id="valA" class="highlight">50</span></label>
+                        <input type="range" id="sliderA" min="10" max="100" value="50">
+                        <label>Mesafe (d): <span id="valD" class="highlight">20</span></label>
+                        <input type="range" id="sliderD" min="5" max="40" value="20">
+                        <label>Pil (V): <span id="valV" class="highlight">12</span>V</label>
+                        <input type="range" id="sliderV" min="0" max="24" value="12">
+                    </div>
+                </div>
+
+                <div id="panel_ohm" class="panel" style="display: none;">
+                    <div class="mode-switch">
+                        <button id="btn-seri" class="mode-btn active">SERİ BAĞLANTI</button>
+                        <button id="btn-paralel" class="mode-btn">PARALEL BAĞLANTI</button>
+                    </div>
+                    <div class="data-panel-c" style="margin-bottom: 10px;">
+                        <div class="data-item-c"><span class="data-label-c">EŞDEĞER DİRENÇ</span><span class="data-value-c" id="ohm-val-req">0.00 Ω</span></div>
+                        <div class="data-item-c"><span class="data-label-c">ANA AKIM</span><span class="data-value-c" id="ohm-val-itot">0.00 A</span></div>
+                    </div>
+                    <div class="control-group" style="margin-bottom: 0;">
+                        <label>Üreteç Gerilimi: <span id="ohm-lbl-v" class="highlight">24</span> V</label>
+                        <input type="range" id="ohm-inp-v" min="1" max="60" value="24" step="1">
+                        <label>R1 Direnci: <span id="ohm-lbl-r1" class="highlight">4</span> Ω</label>
+                        <input type="range" id="ohm-inp-r1" min="1" max="50" value="4" step="1">
+                        <label>R2 Direnci: <span id="ohm-lbl-r2" class="highlight">6</span> Ω</label>
+                        <input type="range" id="ohm-inp-r2" min="1" max="50" value="6" step="1">
+                        <label>R3 Direnci: <span id="ohm-lbl-r3" class="highlight">12</span> Ω</label>
+                        <input type="range" id="ohm-inp-r3" min="1" max="50" value="12" step="1">
+                    </div>
+                </div>
+
+                <div id="panel_uretec" class="panel" style="display: none;">
+                    <div class="data-panel-c">
+                        <div class="data-item-c"><span class="data-label-c">TOPLAM EMK</span><span class="data-value-c" id="ur-val-emk" style="color:#e67e22">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">ANA AKIM</span><span class="data-value-c" id="ur-val-i" style="color:#3498db">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">EŞDEĞER r</span><span class="data-value-c" id="ur-val-r" style="color:#bdc3c7">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">LAMBA GÜCÜ</span><span class="data-value-c" id="ur-val-p" style="color:#f1c40f">0.00</span></div>
+                    </div>
+                    <div class="control-group" style="border:none; padding:0;">
+                        <div class="mode-switch">
+                            <button id="ur-btn-seri" class="mode-btn active" style="background-color: #e67e22;">PİLLER SERİ</button>
+                            <button id="ur-btn-paralel" class="mode-btn">PİLLER PARALEL</button>
+                        </div>
+                        <label>Üreteç Sayısı (n): <span id="ur-lbl-n" class="highlight">3</span></label>
+                        <input type="range" id="ur-inp-n" min="1" max="10" value="3" step="1">
+                        <label>1 Pilin Emk'sı (ε): <span id="ur-lbl-e" class="highlight">1.5</span> V</label>
+                        <input type="range" id="ur-inp-e" min="1.0" max="12.0" value="1.5" step="0.5">
+                        <label>1 Pilin İç Direnci (r): <span id="ur-lbl-r_in" class="highlight">0.5</span> Ω</label>
+                        <input type="range" id="ur-inp-r_in" min="0.0" max="5.0" value="0.5" step="0.1">
+                        <label>Dış Direnç Lamba (R): <span id="ur-lbl-R" class="highlight">10</span> Ω</label>
+                        <input type="range" id="ur-inp-R" min="1" max="50" value="10" step="1">
+                    </div>
+                </div>
+
+                <div id="panel_selenoid" class="panel" style="display: none;">
+                    <div class="data-panel-c">
+                        <div class="data-item-c"><span class="data-label-c">MERKEZ ALAN (B)</span><span class="data-value-c" id="sel-b" style="color:#e74c3c">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">ALAN YÖNÜ</span><span class="data-value-c" id="sel-dir" style="color:#f1c40f">-</span></div>
+                    </div>
+                    <div class="control-group" style="border:none; padding:0;">
+                        <label>Sarım Sayısı (N): <span id="sel-lbl-n" class="highlight">15</span></label>
+                        <input type="range" id="sel-n" min="5" max="30" value="15" step="1">
+                        <label>Akım Şiddeti (I): <span id="sel-lbl-i" class="highlight">5</span> A</label>
+                        <input type="range" id="sel-i" min="-10" max="10" value="5" step="1">
+                    </div>
+                    <div class="formula-box" style="font-size:0.9rem">
+                        <b>B = 4π · K · (N/L) · I</b> <br> 
+                        <span style="font-size:0.8rem; color:#666">Pusulayı parmağınızla tuval üzerinde gezdirin.</span>
+                    </div>
+                </div>
+
+                <div id="panel_renk" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <label>Işık Rengi:
+                            <select id="optik-isik" class="optik-select">
+                                <option value="beyaz">Beyaz</option>
+                                <option value="kirmizi">Kırmızı</option>
+                                <option value="yesil">Yeşil</option>
+                                <option value="mavi">Mavi</option>
+                            </select>
+                        </label>
+                        <label>Zemin Rengi:
+                            <select id="optik-zemin" class="optik-select">
+                                <option value="yesil">Yeşil</option>
+                                <option value="kirmizi">Kırmızı</option>
+                                <option value="mavi">Mavi</option>
+                                <option value="beyaz">Beyaz</option>
+                                <option value="magenta">Magenta</option>
+                            </select>
+                        </label>
+                        <label>Cisim Rengi:
+                            <select id="optik-nesne" class="optik-select">
+                                <option value="sari">Sarı</option>
+                                <option value="turuncu">Turuncu</option>
+                                <option value="mavi">Mavi</option>
+                                <option value="yesil">Yeşil</option>
+                                <option value="magenta">Magenta</option>
+                                <option value="kirmizi">Kırmızı</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="data-panel-c" style="grid-template-columns: 1fr;">
+                        <div class="data-item-c" style="margin-bottom:5px;">
+                            <span class="data-label-c">Zemin Nasıl Görünür?</span>
+                            <span class="data-value-c" id="res-zemin">-</span>
+                        </div>
+                        <div class="data-item-c">
+                            <span class="data-label-c">Cisim Nasıl Görünür?</span>
+                            <span class="data-value-c" id="res-nesne">-</span>
+                        </div>
+                    </div>
+                    <div id="kamuflaj-durumu" style="text-align:center; font-weight:bold; font-size:14px; padding:10px; border-radius:5px;"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let currentSimulation = ''; 
+        let animasyonID; 
+        let cursor = { x: 375, y: 225 };
+
+        // Ortak Renk Kütüphanesi
+        const optikRenkler = {
+            'beyaz': '#ffffff', 'kirmizi': '#e74c3c', 'yesil': '#2ecc71',
+            'mavi': '#3498db', 'sari': '#f1c40f', 'magenta': '#9b59b6',
+            'turuncu': '#e67e22', 'siyah': '#1e1e24'
+        };
+        const optikIsimler = {
+            'beyaz': 'Beyaz', 'kirmizi': 'Kırmızı', 'yesil': 'Yeşil',
+            'mavi': 'Mavi', 'sari': 'Sarı', 'magenta': 'Mor',
+            'turuncu': 'Turuncu', 'siyah': 'Siyah'
+        };
+
+        // Fare ve Dokunmatik Takip
+        function updateCursor(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            if (clientX && clientY) {
+                cursor.x = clientX - rect.left;
+                cursor.y = clientY - rect.top;
+                if (currentSimulation === 'manyetizma') drawManyetizma();
+            }
+        }
+        canvas.addEventListener('mousemove', updateCursor);
+        canvas.addEventListener('touchmove', function(e) { e.preventDefault(); updateCursor(e); }, {passive: false});
+
+        // 1. Manyetizma Çizim Fonksiyonları
+        function drawCurrentMark(x, y, val) {
+            ctx.beginPath();
+            ctx.arc(x, y, 12, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            if (val > 0) {
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#333';
+                ctx.fill();
+            } else if (val < 0) {
+                ctx.beginPath();
+                ctx.moveTo(x - 6, y - 6); ctx.lineTo(x + 6, y + 6);
+                ctx.moveTo(x + 6, y - 6); ctx.lineTo(x - 6, y + 6);
+                ctx.stroke();
+            }
+        }
+
+        function drawArrow(x, y, vx, vy, color, width) {
+            let len = Math.sqrt(vx * vx + vy * vy);
+            if (len < 1) return;
+            let maxLen = 150;
+            let scale = len > maxLen ? maxLen / len : 1;
+            vx *= scale;
+            vy *= scale;
+            
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + vx, y + vy);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.stroke();
+            
+            const angle = Math.atan2(vy, vx);
+            ctx.save();
+            ctx.translate(x + vx, y + vy);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0); ctx.lineTo(-12, 6); ctx.lineTo(-12, -6);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawManyetizma() {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const iW = parseFloat(document.getElementById('sliderWire').value);
+            const iL = parseFloat(document.getElementById('sliderLoop').value);
+            const showWire = document.getElementById('checkWire').checked;
+            const showLoop = document.getElementById('checkLoop').checked;
+            const K_mag = 2500;
+            
+            let netB = { x: 0, y: 0 };
+            let bWire = { x: 0, y: 0 };
+            let bLoop = { x: 0, y: 0 };
+
+            if (showWire) {
+                drawCurrentMark(200, 225, iW);
+                ctx.fillStyle = "#7f8c8d";
+                ctx.font = "14px Arial";
+                ctx.fillText("Düz Tel", 175, 260);
+                if (iW !== 0) {
+                    let dx = cursor.x - 200;
+                    let dy = cursor.y - 225;
+                    let r2 = dx * dx + dy * dy;
+                    if (r2 > 150) {
+                        bWire.x = K_mag * iW * dy / r2;
+                        bWire.y = -K_mag * iW * dx / r2;
+                        netB.x += bWire.x;
+                        netB.y += bWire.y;
+                    }
+                }
+            }
+
+            if (showLoop) {
+                ctx.beginPath();
+                ctx.ellipse(500, 225, 30, 80, 0, 0, Math.PI * 2);
+                ctx.strokeStyle = '#bdc3c7';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                ctx.fillStyle = "#7f8c8d";
+                ctx.font = "14px Arial";
+                ctx.fillText("Çember", 475, 335);
+                
+                if (iL !== 0) {
+                    drawCurrentMark(500, 145, iL);
+                    drawCurrentMark(500, 305, -iL);
+                    
+                    let sources = [[500, 145, iL], [500, 305, -iL]];
+                    for (let i = 0; i < sources.length; i++) {
+                        let src = sources[i];
+                        let dx = cursor.x - src[0];
+                        let dy = cursor.y - src[1];
+                        let r2 = dx * dx + dy * dy;
+                        if (r2 > 150) {
+                            bLoop.x += K_mag * src[2] * dy / r2;
+                            bLoop.y += -K_mag * src[2] * dx / r2;
+                        }
+                    }
+                    netB.x += bLoop.x;
+                    netB.y += bLoop.y;
+                } else {
+                    drawCurrentMark(500, 145, 0);
+                    drawCurrentMark(500, 305, 0);
+                }
+            }
+            
+            ctx.beginPath();
+            ctx.arc(cursor.x, cursor.y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#e74c3c';
+            ctx.fill();
+            
+            if (showWire) drawArrow(cursor.x, cursor.y, bWire.x, bWire.y, '#2980b9', 3);
+            if (showLoop) drawArrow(cursor.x, cursor.y, bLoop.x, bLoop.y, '#27ae60', 3);
+            if ((showWire && iW !== 0) || (showLoop && iL !== 0)) {
+                drawArrow(cursor.x, cursor.y, netB.x, netB.y, '#e74c3c', 5);
+            }
+        }
+
+        // Renk Deneyi Filtreleme Formülü
+        function algilananRengiHesapla(isik, cisim) {
+            if (isik === 'beyaz') return cisim;
+            if (isik === 'kirmizi') {
+                if (cisim === 'kirmizi' || cisim === 'sari' || cisim === 'magenta' || cisim === 'beyaz' || cisim === 'turuncu') return 'kirmizi';
+                return 'siyah';
+            }
+            if (isik === 'yesil') {
+                if (cisim === 'yesil' || cisim === 'sari' || cisim === 'beyaz') return 'yesil';
+                return 'siyah';
+            }
+            if (isik === 'mavi') {
+                if (cisim === 'mavi' || cisim === 'magenta' || cisim === 'beyaz') return 'mavi';
+                return 'siyah';
+            }
+            return 'siyah';
+        }
+
+        // Genel Değişkenler
+        let particle = { x: 100, v: 0, running: false };
+        let ohmMode = 'seri';
+        let urMode = 'seri';
+
+        // ================= ANA BAŞLATMA FONKSİYONU =================
+        function openSimulation(simId) {
+            currentSimulation = simId;
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('simArea').style.display = 'block';
+            
+            // Tüm Panelleri Gizle/Göster
+            let paneller = ['manyetizma', 'dalga', 'levha', 'kondansator', 'ohm', 'uretec', 'selenoid', 'renk'];
+            for (let i = 0; i < paneller.length; i++) {
+                let p = paneller[i];
+                let elem = document.getElementById('panel_' + p);
+                if (elem) {
+                    elem.style.display = (p === simId) ? 'block' : 'none';
+                }
+            }
+
+            if (animasyonID) {
+                cancelAnimationFrame(animasyonID);
+            }
+            
+            // Arka Plan Rengini Ayarla
+            if (simId === 'kondansator' || simId === 'ohm' || simId === 'uretec' || simId === 'selenoid') {
+                canvas.style.background = '#1e1e24';
+            } else {
+                canvas.style.background = '#ffffff';
+            }
+
+            // --- 1. MANYETİZMA ---
+            if (simId === 'manyetizma') {
+                document.getElementById('sliderWire').addEventListener('input', drawManyetizma);
+                document.getElementById('sliderLoop').addEventListener('input', drawManyetizma);
+                document.getElementById('checkWire').addEventListener('change', drawManyetizma);
+                document.getElementById('checkLoop').addEventListener('change', drawManyetizma);
+                drawManyetizma();
+            }
+            
+            // --- 2. DALGA ---
+            else if (simId === 'dalga') {
+                let time = 0;
+                let lastTime = performance.now();
+                function cizDalga() {
+                    let f = parseFloat(document.getElementById('freq').value);
+                    let lambda = parseFloat(document.getElementById('wave').value);
+                    let A = parseFloat(document.getElementById('amp').value);
+                    
+                    let currentTime = performance.now();
+                    let dt = (currentTime - lastTime) / 1000;
+                    lastTime = currentTime;
+                    time += dt;
+                    
+                    document.getElementById('freq-val').innerText = f.toFixed(1);
+                    document.getElementById('wave-val').innerText = lambda;
+                    document.getElementById('amp-val').innerText = A;
+                    document.getElementById('speed-val').innerText = (f * lambda).toFixed(1);
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.beginPath();
+                    ctx.moveTo(0, canvas.height / 2);
+                    ctx.lineTo(canvas.width, canvas.height / 2);
+                    ctx.strokeStyle = '#bdc3c7';
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#3498db';
+                    ctx.lineWidth = 4;
+                    for (let x = 0; x < canvas.width; x++) {
+                        let y = canvas.height / 2 - A * Math.sin(2 * Math.PI * (x / lambda - f * time));
+                        if (x === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+                    ctx.stroke();
+                    animasyonID = requestAnimationFrame(cizDalga);
+                }
+                cizDalga();
+            }
+            
+            // --- 3. LEVHALAR ---
+            else if (simId === 'levha') {
+                particle.x = 100;
+                particle.v = 0;
+                particle.running = false;
+                
+                document.getElementById('btn_fire').onclick = function() {
+                    particle.x = 100;
+                    particle.v = 0;
+                    particle.running = true;
+                };
+                
+                function cizLevha() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    let V_acc = parseFloat(document.getElementById('Vacc').value);
+                    let V_dec = parseFloat(document.getElementById('Vdec').value);
+                    
+                    document.getElementById('vacc-val').innerText = V_acc;
+                    document.getElementById('vdec-val').innerText = V_dec;
+
+                    let q = 1.0;
+                    let m = 10.0;
+                    let d = 1.0;
+                    
+                    let a1 = (q * V_acc) / (m * d);
+                    let v1_max = Math.sqrt(2 * a1 * d);
+                    let a2 = (q * V_dec) / (m * d);
+                    let K_acc = 0.5 * m * (v1_max * v1_max);
+                    let K_son = K_acc - (q * V_dec);
+                    let v2_son = (K_son >= 0) ? Math.sqrt(2 * K_son / m) : 0;
+                    
+                    ctx.fillStyle = 'rgba(46, 204, 113, 0.1)';
+                    ctx.fillRect(100, 0, 250, 450);
+                    ctx.fillStyle = 'rgba(231, 76, 60, 0.1)';
+                    ctx.fillRect(350, 0, 250, 450);
+                    
+                    ctx.fillStyle = '#7f8c8d';
+                    ctx.fillRect(95, 125, 10, 200);
+                    ctx.fillRect(345, 125, 10, 200);
+                    ctx.fillRect(595, 125, 10, 200);
+                    
+                    ctx.font = '16px Arial';
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.fillText("+" + V_acc + "V", 80, 110);
+                    ctx.fillText("0V", 345, 110);
+                    ctx.fillText("+" + V_dec + "V", 585, 110);
+                    
+                    ctx.font = '15px Consolas, monospace';
+                    ctx.fillText("[1. Bölge] a1: " + a1.toFixed(2) + " | V_max: " + v1_max.toFixed(2), 110, 360);
+                    
+                    let durumMetni = K_son < 0 ? "GERİ DÖNER" : "V_son: " + v2_son.toFixed(2);
+                    ctx.fillText("[2. Bölge] a2: -" + a2.toFixed(2) + " | Durum: " + durumMetni, 110, 390);
+
+                    ctx.beginPath();
+                    ctx.arc(particle.x, 225, 12, 0, Math.PI * 2);
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.fill();
+                    ctx.fillStyle = 'white';
+                    ctx.font = '14px Arial';
+                    ctx.fillText('+', particle.x - 4, 230);
+
+                    if (particle.running) {
+                        if (particle.x >= 100 && particle.x < 350) {
+                            particle.v += a1 * 0.2;
+                        } else if (particle.x >= 350 && particle.x <= 600) {
+                            particle.v -= a2 * 0.2;
+                        }
+                        particle.x += particle.v;
+                        
+                        if (particle.x >= 600) {
+                            particle.running = false;
+                            particle.x = 600;
+                        } else if (particle.x <= 100 && particle.v < 0) {
+                            particle.running = false;
+                            particle.x = 100;
+                        }
+                    }
+                    animasyonID = requestAnimationFrame(cizLevha);
+                }
+                cizLevha();
+            }
+            
+            // --- 4. KONDANSATÖR ---
+            else if (simId === 'kondansator') {
+                let t_alan = 0;
+                function cizKondansator() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    let A = parseFloat(document.getElementById('sliderA').value);
+                    let d = parseFloat(document.getElementById('sliderD').value);
+                    let V = parseFloat(document.getElementById('sliderV').value);
+                    
+                    document.getElementById('valA').innerText = A;
+                    document.getElementById('valD').innerText = d;
+                    document.getElementById('valV').innerText = V;
+
+                    let C = (8.85 * A) / d;
+                    let Q = C * V;
+                    let E = V / d;
+                    
+                    document.getElementById('outC').innerText = C.toFixed(2);
+                    document.getElementById('outQ').innerText = Q.toFixed(2);
+
+                    let levhaB = 100 + (A * 2);
+                    let levhaA = d * 5;
+                    let mY = canvas.height / 2;
+                    let solX = canvas.width / 2 - levhaA / 2;
+                    let sagX = canvas.width / 2 + levhaA / 2;
+                    let ustY = mY - levhaB / 2;
+                    
+                    ctx.strokeStyle = '#555';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.moveTo(solX, mY); ctx.lineTo(solX - 100, mY); ctx.lineTo(solX - 100, 400);
+                    ctx.moveTo(sagX, mY); ctx.lineTo(sagX + 100, mY); ctx.lineTo(sagX + 100, 400);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#2c3e50'; ctx.fillRect(solX - 120, 380, sagX - solX + 240, 40);
+                    ctx.fillStyle = '#e74c3c'; ctx.fillRect(solX - 105, 385, 20, 30);
+                    ctx.fillStyle = '#3498db'; ctx.fillRect(sagX + 85, 385, 20, 30);
+                    ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.fillText(V + " Volt Pil", canvas.width / 2 - 40, 405);
+                    
+                    ctx.fillStyle = '#e74c3c'; ctx.fillRect(solX - 10, ustY, 10, levhaB);
+                    ctx.fillStyle = '#3498db'; ctx.fillRect(sagX, ustY, 10, levhaB);
+
+                    if (V > 0) {
+                        let yS = Math.min(Math.floor(Q / 50), 20);
+                        let adim = levhaB / (yS + 1);
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '14px Arial';
+                        for (let i = 1; i <= yS; i++) {
+                            ctx.fillText('+', solX - 25, ustY + (i * adim) + 5);
+                            ctx.fillText('-', sagX + 15, ustY + (i * adim) + 4);
+                        }
+                        
+                        let cS = Math.min(Math.floor(E * 5), 15);
+                        let cA = levhaB / (cS + 1);
+                        ctx.strokeStyle = 'rgba(231, 76, 60, 0.6)';
+                        ctx.lineWidth = 1.5;
+                        t_alan += 0.5;
+                        
+                        for (let i = 1; i <= cS; i++) {
+                            let cY = ustY + (i * cA);
+                            ctx.beginPath();
+                            ctx.moveTo(solX, cY);
+                            ctx.lineTo(sagX, cY);
+                            ctx.stroke();
+                            
+                            let okX = solX + ((t_alan + i * 10) % levhaA);
+                            if (okX > solX && okX < sagX) {
+                                ctx.beginPath();
+                                ctx.moveTo(okX, cY);
+                                ctx.lineTo(okX - 6, cY - 4);
+                                ctx.lineTo(okX - 6, cY + 4);
+                                ctx.fillStyle = 'rgba(231, 76, 60, 0.8)';
+                                ctx.fill();
+                            }
+                        }
+                    }
+                    animasyonID = requestAnimationFrame(cizKondansator);
+                }
+                cizKondansator();
+            }
+            
+            // --- 5. OHM YASASI ---
+            else if (simId === 'ohm') {
+                let btnS = document.getElementById('btn-seri');
+                let btnP = document.getElementById('btn-paralel');
+                
+                function drawR(x, y, lbl, vText) {
+                    ctx.strokeStyle = '#f39c12';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    for (let i = 0; i < 4; i++) {
+                        ctx.lineTo(x + 10 + (i * 20), y - 10);
+                        ctx.lineTo(x + 20 + (i * 20), y + 10);
+                    }
+                    ctx.lineTo(x + 100, y);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '14px Arial';
+                    ctx.fillText(lbl, x + 50, y - 20);
+                    ctx.fillStyle = '#3498db';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillText(vText, x + 50, y + 30);
+                }
+                
+                function runOhm() {
+                    let V = parseFloat(document.getElementById('ohm-inp-v').value);
+                    let R1 = parseFloat(document.getElementById('ohm-inp-r1').value);
+                    let R2 = parseFloat(document.getElementById('ohm-inp-r2').value);
+                    let R3 = parseFloat(document.getElementById('ohm-inp-r3').value);
+                    
+                    document.getElementById('ohm-lbl-v').innerText = V;
+                    document.getElementById('ohm-lbl-r1').innerText = R1;
+                    document.getElementById('ohm-lbl-r2').innerText = R2;
+                    document.getElementById('ohm-lbl-r3').innerText = R3;
+                    
+                    let Req = 0;
+                    let Itot = 0;
+
+                    if (ohmMode === 'seri') {
+                        Req = R1 + R2 + R3;
+                        Itot = V / Req;
+                    } else {
+                        Req = 1 / ((1 / R1) + (1 / R2) + (1 / R3));
+                        Itot = V / Req;
+                    }
+                    
+                    document.getElementById('ohm-val-req').innerText = Req.toFixed(2) + " Ω";
+                    document.getElementById('ohm-val-itot').innerText = Itot.toFixed(2) + " A";
+                    
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.strokeStyle = '#bdc3c7';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.moveTo(100, 225); ctx.lineTo(100, 400); ctx.lineTo(350, 400); ctx.lineTo(600, 400); ctx.lineTo(600, 225);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#2c3e50'; ctx.fillRect(310, 380, 80, 40);
+                    ctx.fillStyle = '#e74c3c'; ctx.fillRect(300, 385, 10, 30);
+                    ctx.fillStyle = '#3498db'; ctx.fillRect(390, 385, 10, 30);
+                    ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.textAlign = 'center';
+                    ctx.fillText(V + "V", 350, 365);
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.fillText("Ana Akım: " + Itot.toFixed(2) + "A", 350, 440);
+
+                    if (ohmMode === 'seri') {
+                        ctx.beginPath();
+                        ctx.moveTo(100, 225); ctx.lineTo(150, 225);
+                        ctx.moveTo(250, 225); ctx.lineTo(300, 225);
+                        ctx.moveTo(400, 225); ctx.lineTo(450, 225);
+                        ctx.moveTo(550, 225); ctx.lineTo(600, 225);
+                        ctx.stroke();
+                        
+                        drawR(150, 225, "R1:" + R1 + "Ω", (Itot * R1).toFixed(1) + "V");
+                        drawR(300, 225, "R2:" + R2 + "Ω", (Itot * R2).toFixed(1) + "V");
+                        drawR(450, 225, "R3:" + R3 + "Ω", (Itot * R3).toFixed(1) + "V");
+                    } else {
+                        ctx.beginPath();
+                        ctx.moveTo(100, 100); ctx.lineTo(100, 350);
+                        ctx.moveTo(600, 100); ctx.lineTo(600, 350);
+                        
+                        let yList = [100, 225, 350];
+                        for (let i = 0; i < yList.length; i++) {
+                            let y = yList[i];
+                            ctx.moveTo(100, y); ctx.lineTo(250, y);
+                            ctx.moveTo(350, y); ctx.lineTo(600, y);
+                        }
+                        ctx.stroke();
+                        
+                        drawR(250, 100, "R1:" + R1 + "Ω", (V / R1).toFixed(2) + "A");
+                        drawR(250, 225, "R2:" + R2 + "Ω", (V / R2).toFixed(2) + "A");
+                        drawR(250, 350, "R3:" + R3 + "Ω", (V / R3).toFixed(2) + "A");
+                    }
+                    animasyonID = requestAnimationFrame(runOhm);
+                }
+                
+                btnS.onclick = function() {
+                    ohmMode = 'seri';
+                    btnS.classList.add('active');
+                    btnP.classList.remove('active');
+                };
+                
+                btnP.onclick = function() {
+                    ohmMode = 'paralel';
+                    btnP.classList.add('active');
+                    btnS.classList.remove('active');
+                };
+                
+                runOhm();
+            }
+            
+            // --- 6. ÜRETEÇLER ---
+            else if (simId === 'uretec') {
+                let btnUS = document.getElementById('ur-btn-seri');
+                let btnUP = document.getElementById('ur-btn-paralel');
+                
+                function runUretec() {
+                    let n = parseFloat(document.getElementById('ur-inp-n').value);
+                    let e = parseFloat(document.getElementById('ur-inp-e').value);
+                    let r_in = parseFloat(document.getElementById('ur-inp-r_in').value);
+                    let R = parseFloat(document.getElementById('ur-inp-R').value);
+                    
+                    document.getElementById('ur-lbl-n').innerText = n;
+                    document.getElementById('ur-lbl-e').innerText = e.toFixed(1);
+                    document.getElementById('ur-lbl-r_in').innerText = r_in.toFixed(1);
+                    document.getElementById('ur-lbl-R').innerText = R;
+                    
+                    let v_top = 0, r_top = 0;
+                    
+                    if (urMode === 'seri') {
+                        v_top = n * e;
+                        r_top = n * r_in;
+                    } else {
+                        v_top = e;
+                        r_top = r_in / n;
+                    }
+                    
+                    let I = v_top / (R + r_top);
+                    let P = Math.pow(I, 2) * R;
+                    let brightness = Math.min(P / 5, 1);
+                    
+                    document.getElementById('ur-val-emk').innerText = v_top.toFixed(2) + " V";
+                    document.getElementById('ur-val-r').innerText = r_top.toFixed(2) + " Ω";
+                    document.getElementById('ur-val-i').innerText = I.toFixed(2) + " A";
+                    document.getElementById('ur-val-p').innerText = P.toFixed(2) + " W";
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.strokeStyle = '#bdc3c7';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.moveTo(200, 225); ctx.lineTo(200, 100); ctx.lineTo(500, 100); ctx.lineTo(500, 225);
+                    ctx.stroke();
+                    
+                    let lX = 350, lY = 100;
+                    if (P > 0.01) {
+                        ctx.beginPath();
+                        ctx.arc(lX, lY, 30 + brightness * 40, 0, Math.PI * 2);
+                        let grad = ctx.createRadialGradient(lX, lY, 10, lX, lY, 30 + brightness * 40);
+                        grad.addColorStop(0, 'rgba(255, 215, 0, ' + (0.4 + brightness * 0.4) + ')');
+                        grad.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                        ctx.fillStyle = grad;
+                        ctx.fill();
+                    }
+                    
+                    ctx.beginPath();
+                    ctx.arc(lX, lY, 20, 0, Math.PI * 2);
+                    ctx.fillStyle = P > 0.01 ? 'rgba(255, 240, 100, ' + (0.5 + brightness * 0.5) + ')' : '#333';
+                    ctx.fill();
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#7f8c8d';
+                    ctx.fillRect(lX - 10, lY + 15, 20, 15);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText("Lamba R: " + R + "Ω", lX, lY - 40);
+
+                    if (urMode === 'seri') {
+                        let pStart = 200 + (300 - (n * 40)) / 2;
+                        ctx.beginPath();
+                        ctx.moveTo(200, 225);
+                        ctx.lineTo(500, 225);
+                        ctx.stroke();
+                        for (let i = 0; i < n; i++) {
+                            let px = pStart + (i * 40);
+                            ctx.fillStyle = '#2c3e50';
+                            ctx.fillRect(px, 210, 30, 30);
+                            ctx.fillStyle = '#e74c3c';
+                            ctx.fillRect(px, 210, 5, 30);
+                        }
+                    } else {
+                        let pAralik = 200 / n;
+                        let yStart = 225 - (n * pAralik) / 2 + (pAralik / 2);
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(200, yStart); ctx.lineTo(200, yStart + (n - 1) * pAralik);
+                        ctx.stroke();
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(500, yStart); ctx.lineTo(500, yStart + (n - 1) * pAralik);
+                        ctx.stroke();
+                        
+                        for (let i = 0; i < n; i++) {
+                            let py = yStart + (i * pAralik);
+                            ctx.beginPath();
+                            ctx.moveTo(200, py);
+                            ctx.lineTo(500, py);
+                            ctx.stroke();
+                            
+                            ctx.fillStyle = '#2c3e50';
+                            ctx.fillRect(335, py - 15, 30, 30);
+                            ctx.fillStyle = '#e74c3c';
+                            ctx.fillRect(335, py - 15, 5, 30);
+                        }
+                    }
+                    animasyonID = requestAnimationFrame(runUretec);
+                }
+                
+                btnUS.onclick = function() {
+                    urMode = 'seri';
+                    btnUS.classList.add('active');
+                    btnUS.style.backgroundColor = '#e67e22';
+                    btnUP.classList.remove('active');
+                    btnUP.style.backgroundColor = '';
+                };
+                
+                btnUP.onclick = function() {
+                    urMode = 'paralel';
+                    btnUP.classList.add('active');
+                    btnUP.style.backgroundColor = '#e67e22';
+                    btnUS.classList.remove('active');
+                    btnUS.style.backgroundColor = '';
+                };
+                
+                runUretec();
+            }
+            
+            // --- 7. SELENOİD ---
+            else if (simId === 'selenoid') {
+                function runSelenoid() {
+                    let N = parseInt(document.getElementById('sel-n').value);
+                    let I = parseFloat(document.getElementById('sel-i').value);
+                    let L = 300, startX = 225, centerY = 225;
+                    
+                    document.getElementById('sel-lbl-n').innerText = N;
+                    document.getElementById('sel-lbl-i').innerText = I;
+                    document.getElementById('sel-b').innerText = Math.abs(N * I / L * 100).toFixed(2);
+                    document.getElementById('sel-dir').innerText = I > 0 ? "Sağ" : (I < 0 ? "Sol" : "Yok");
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.strokeStyle = "#7f8c8d";
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.moveTo(startX - 80, centerY + 50); ctx.lineTo(startX, centerY + 50); ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(startX + L, centerY + 50); ctx.lineTo(startX + L + 80, centerY + 50); ctx.stroke();
+                    
+                    if (I !== 0) {
+                        ctx.fillStyle = "#e74c3c";
+                        let dir = I > 0 ? 1 : -1;
+                        ctx.beginPath();
+                        ctx.moveTo(startX - 40, centerY + 44);
+                        ctx.lineTo(startX - 40 + (dir * 12), centerY + 50);
+                        ctx.lineTo(startX - 40, centerY + 56);
+                        ctx.fill();
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(startX + L + 40, centerY + 44);
+                        ctx.lineTo(startX + L + 40 + (dir * 12), centerY + 50);
+                        ctx.lineTo(startX + L + 40, centerY + 56);
+                        ctx.fill();
+                    }
+
+                    ctx.fillStyle = "rgba(149, 165, 166, 0.15)";
+                    ctx.fillRect(startX - 10, centerY - 35, L + 20, 70);
+                    
+                    ctx.strokeStyle = "#e67e22";
+                    ctx.lineWidth = 3;
+                    for (let i = 0; i < N; i++) {
+                        let px = startX + (i * (L / N));
+                        ctx.beginPath();
+                        ctx.ellipse(px, centerY, 15, 40, 0, 0, Math.PI * 2);
+                        ctx.stroke();
+                        
+                        if (I !== 0) {
+                            ctx.fillStyle = "#e74c3c";
+                            ctx.beginPath();
+                            let okX = px + 15;
+                            if (I > 0) {
+                                ctx.moveTo(okX - 5, centerY - 6);
+                                ctx.lineTo(okX, centerY + 8);
+                                ctx.lineTo(okX + 5, centerY - 6);
+                            } else {
+                                ctx.moveTo(okX - 5, centerY + 6);
+                                ctx.lineTo(okX, centerY - 8);
+                                ctx.lineTo(okX + 5, centerY + 6);
+                            }
+                            ctx.fill();
+                        }
+                    }
+
+                    if (I !== 0) {
+                        ctx.strokeStyle = "rgba(231, 76, 60, 0.4)";
+                        ctx.lineWidth = 1;
+                        for (let j = -3; j <= 3; j++) {
+                            ctx.beginPath();
+                            ctx.moveTo(startX - 60, centerY + j * 10);
+                            ctx.lineTo(startX + L + 60, centerY + j * 10);
+                            ctx.stroke();
+                            
+                            let arrowX = I > 0 ? startX + L + 45 : startX - 45;
+                            ctx.beginPath();
+                            ctx.moveTo(arrowX, centerY + j * 10);
+                            ctx.lineTo(arrowX - (I > 0 ? 10 : -10), centerY + j * 10 - 4);
+                            ctx.lineTo(arrowX - (I > 0 ? 10 : -10), centerY + j * 10 + 4);
+                            ctx.fillStyle = "rgba(231, 76, 60, 0.7)";
+                            ctx.fill();
+                        }
+                    }
+
+                    ctx.save();
+                    ctx.translate(cursor.x, cursor.y);
+                    let angle = 0;
+                    if (cursor.x > startX && cursor.x < startX + L && Math.abs(cursor.y - centerY) < 60) {
+                        angle = I > 0 ? 0 : Math.PI;
+                    } else {
+                        angle = Math.atan2(cursor.y - centerY, cursor.x - (startX + L / 2));
+                        if (I < 0) angle += Math.PI;
+                    }
+                    if (I === 0) angle = -Math.PI / 2;
+                    
+                    ctx.rotate(angle);
+                    ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI * 2); ctx.fillStyle = "#2c3e50"; ctx.fill();
+                    ctx.strokeStyle = "#bdc3c7"; ctx.lineWidth = 3; ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(0, -6); ctx.lineTo(0, 6); ctx.fillStyle = "#e74c3c"; ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(-18, 0); ctx.lineTo(0, -6); ctx.lineTo(0, 6); ctx.fillStyle = "#bdc3c7"; ctx.fill();
+                    ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fillStyle = "#fff"; ctx.fill();
+                    ctx.restore();
+
+                    animasyonID = requestAnimationFrame(runSelenoid);
+                }
+                runSelenoid();
+            }
+            
+            // --- 8. RENK VE IŞIK ---
+            else if (simId === 'renk') {
+                function runRenk() {
+                    let isikDegeri = document.getElementById('optik-isik').value;
+                    let zeminDegeri = document.getElementById('optik-zemin').value;
+                    let nesneDegeri = document.getElementById('optik-nesne').value;
+                    
+                    let algZemin = algilananRengiHesapla(isikDegeri, zeminDegeri);
+                    let algNesne = algilananRengiHesapla(isikDegeri, nesneDegeri);
+
+                    document.getElementById('res-zemin').innerText = optikIsimler[algZemin];
+                    document.getElementById('res-nesne').innerText = optikIsimler[algNesne];
+                    document.getElementById('res-zemin').style.color = (algZemin === 'beyaz') ? '#bdc3c7' : optikRenkler[algZemin];
+                    document.getElementById('res-nesne').style.color = (algNesne === 'beyaz') ? '#bdc3c7' : optikRenkler[algNesne];
+
+                    let kam = document.getElementById('kamuflaj-durumu');
+                    if (algZemin === algNesne) {
+                        kam.innerText = "DİKKAT: NESNE KAMUFLE OLDU (Görünmez / Okunamaz)";
+                        kam.style.backgroundColor = "rgba(231, 76, 60, 0.2)";
+                        kam.style.color = "#c0392b";
+                    } else {
+                        kam.innerText = "NESNE NET OLARAK GÖRÜNÜR";
+                        kam.style.backgroundColor = "rgba(46, 204, 113, 0.2)";
+                        kam.style.color = "#27ae60";
+                    }
+
+                    // Zemin Çizimi
+                    ctx.fillStyle = optikRenkler[algZemin];
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // Işık Hüzmesi
+                    let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    grad.addColorStop(0, optikRenkler[isikDegeri]);
+                    grad.addColorStop(1, 'rgba(0,0,0,0.8)');
+                    ctx.globalAlpha = 0.25;
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.globalAlpha = 1.0;
+
+                    // Cisim Çizimi (Ortada Güvenli Çubuk)
+                    ctx.fillStyle = optikRenkler[algNesne];
+                    ctx.strokeStyle = algZemin === algNesne ? optikRenkler[algZemin] : 'rgba(0,0,0,0.4)';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.fillRect(150, 200, 450, 80);
+                    if (algZemin !== algNesne) {
+                        ctx.strokeRect(150, 200, 450, 80);
+                    }
+
+                    // Fener Çizimi
+                    ctx.fillStyle = '#34495e';
+                    ctx.beginPath();
+                    ctx.moveTo(335, 0); ctx.lineTo(415, 0); ctx.lineTo(400, 40); ctx.lineTo(350, 40);
+                    ctx.fill();
+                    ctx.fillStyle = optikRenkler[isikDegeri];
+                    ctx.fillRect(350, 40, 50, 10);
+                    
+                    animasyonID = requestAnimationFrame(runRenk);
+                }
+                runRenk();
+            }
+        }
+
+        function closeSimulation() {
+            currentSimulation = '';
+            if (animasyonID) {
+                cancelAnimationFrame(animasyonID);
+            }
+            document.getElementById('mainMenu').style.display = 'flex';
+            document.getElementById('simArea').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
