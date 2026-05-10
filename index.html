@@ -382,4 +382,121 @@
             ctx.beginPath(); ctx.arc(particle.x, 225, 12, 0, Math.PI*2); ctx.fillStyle = '#e74c3c'; ctx.fill(); ctx.fillStyle = 'white'; ctx.font = '14px Arial'; ctx.fillText('+', particle.x-4, 230);
             if (particle.running) {
                 if (particle.x >= 100 && particle.x < 350) { particle.v += a1 * 0.2; } else if (particle.x >= 350 && particle.x <= 600) { particle.v -= a2 * 0.2; }
-                particle.x += particle.v; if (particle.x >= 600) { particle.running = false; particle.x = 600; } else if (particle.x <= 100 && particle.v < 0) { particle.running = false; particle.x = 100
+                particle.x += particle.v; if (particle.x >= 600) { particle.running = false; particle.x = 600; } else if (particle.x <= 100 && particle.v < 0) { particle.running = false; particle.x = 100; }
+            }
+            animasyonID = requestAnimationFrame(calistirLevha);
+        };
+
+        // 4. Kondansatör
+        let t_alan = 0;
+        const calistirKondansator = function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let A = parseFloat(document.getElementById('sliderA').value), d = parseFloat(document.getElementById('sliderD').value), V = parseFloat(document.getElementById('sliderV').value);
+            document.getElementById('valA').innerText = A; document.getElementById('valD').innerText = d; document.getElementById('valV').innerText = V;
+
+            let C = (8.85 * A) / d, Q = C * V, E = V / d;
+            document.getElementById('outC').innerText = C.toFixed(2); document.getElementById('outQ').innerText = Q.toFixed(2);
+
+            let levhaB = 100 + (A * 2), levhaA = d * 5, mY = canvas.height / 2, solX = canvas.width / 2 - levhaA / 2, sagX = canvas.width / 2 + levhaA / 2, ustY = mY - levhaB / 2;
+            ctx.strokeStyle = '#555'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(solX, mY); ctx.lineTo(solX - 100, mY); ctx.lineTo(solX - 100, 400); ctx.moveTo(sagX, mY); ctx.lineTo(sagX + 100, mY); ctx.lineTo(sagX + 100, 400); ctx.stroke();
+            ctx.fillStyle = '#2c3e50'; ctx.fillRect(solX - 120, 380, sagX - solX + 240, 40); ctx.fillStyle = '#e74c3c'; ctx.fillRect(solX - 105, 385, 20, 30); ctx.fillStyle = '#3498db'; ctx.fillRect(sagX + 85, 385, 20, 30); ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.fillText(V + " Volt Pil", canvas.width / 2 - 40, 405);
+            ctx.fillStyle = '#e74c3c'; ctx.fillRect(solX - 10, ustY, 10, levhaB); ctx.fillStyle = '#3498db'; ctx.fillRect(sagX, ustY, 10, levhaB);
+
+            if (V > 0) {
+                let yS = Math.min(Math.floor(Q / 50), 20), adim = levhaB / (yS + 1); ctx.fillStyle = '#fff'; ctx.font = '14px Arial';
+                for (let i = 1; i <= yS; i++) { ctx.fillText('+', solX - 25, ustY + (i * adim) + 5); ctx.fillText('-', sagX + 15, ustY + (i * adim) + 4); }
+                let cS = Math.min(Math.floor(E * 5), 15), cA = levhaB / (cS + 1); ctx.strokeStyle = 'rgba(231, 76, 60, 0.6)'; ctx.lineWidth = 1.5; t_alan += 0.5;
+                for (let i = 1; i <= cS; i++) { let cY = ustY + (i * cA); ctx.beginPath(); ctx.moveTo(solX, cY); ctx.lineTo(sagX, cY); ctx.stroke(); let okX = solX + ((t_alan + i * 10) % levhaA); if (okX > solX && okX < sagX) { ctx.beginPath(); ctx.moveTo(okX, cY); ctx.lineTo(okX - 6, cY - 4); ctx.lineTo(okX - 6, cY + 4); ctx.fillStyle = 'rgba(231, 76, 60, 0.8)'; ctx.fill(); } }
+            }
+            animasyonID = requestAnimationFrame(calistirKondansator);
+        };
+
+        // 5. Ohm
+        const calistirOhm = function() {
+            let V = parseFloat(document.getElementById('ohm-inp-v').value), R1 = parseFloat(document.getElementById('ohm-inp-r1').value), R2 = parseFloat(document.getElementById('ohm-inp-r2').value), R3 = parseFloat(document.getElementById('ohm-inp-r3').value);
+            document.getElementById('ohm-lbl-v').innerText = V; document.getElementById('ohm-lbl-r1').innerText = R1; document.getElementById('ohm-lbl-r2').innerText = R2; document.getElementById('ohm-lbl-r3').innerText = R3;
+            
+            let Req = 0, Itot = 0;
+            if (ohmMode === 'seri') { Req = R1 + R2 + R3; Itot = V / Req; } else { Req = 1 / ((1 / R1) + (1 / R2) + (1 / R3)); Itot = V / Req; }
+            document.getElementById('ohm-val-req').innerText = Req.toFixed(2) + " Ω"; document.getElementById('ohm-val-itot').innerText = Itot.toFixed(2) + " A";
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(100, 225); ctx.lineTo(100, 400); ctx.lineTo(350, 400); ctx.lineTo(600, 400); ctx.lineTo(600, 225); ctx.stroke();
+            ctx.fillStyle = '#2c3e50'; ctx.fillRect(310, 380, 80, 40); ctx.fillStyle = '#e74c3c'; ctx.fillRect(300, 385, 10, 30); ctx.fillStyle = '#3498db'; ctx.fillRect(390, 385, 10, 30); ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.textAlign = 'center'; ctx.fillText(V + "V", 350, 365); ctx.fillStyle = '#e74c3c'; ctx.fillText("Ana Akım: " + Itot.toFixed(2) + "A", 350, 440);
+
+            function drawR_ohm(x, y, lbl, vText) { ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x, y); for (let i = 0; i < 4; i++) { ctx.lineTo(x + 10 + (i * 20), y - 10); ctx.lineTo(x + 20 + (i * 20), y + 10); } ctx.lineTo(x + 100, y); ctx.stroke(); ctx.fillStyle = '#fff'; ctx.font = '14px Arial'; ctx.fillText(lbl, x + 50, y - 20); ctx.fillStyle = '#3498db'; ctx.font = 'bold 16px Arial'; ctx.fillText(vText, x + 50, y + 30); }
+
+            if (ohmMode === 'seri') {
+                ctx.beginPath(); ctx.moveTo(100, 225); ctx.lineTo(150, 225); ctx.moveTo(250, 225); ctx.lineTo(300, 225); ctx.moveTo(400, 225); ctx.lineTo(450, 225); ctx.moveTo(550, 225); ctx.lineTo(600, 225); ctx.stroke();
+                drawR_ohm(150, 225, "R1:" + R1 + "Ω", (Itot * R1).toFixed(1) + "V"); drawR_ohm(300, 225, "R2:" + R2 + "Ω", (Itot * R2).toFixed(1) + "V"); drawR_ohm(450, 225, "R3:" + R3 + "Ω", (Itot * R3).toFixed(1) + "V");
+            } else {
+                ctx.beginPath(); ctx.moveTo(100, 100); ctx.lineTo(100, 350); ctx.moveTo(600, 100); ctx.lineTo(600, 350); let yL = [100, 225, 350]; for (let i = 0; i < 3; i++) { ctx.moveTo(100, yL[i]); ctx.lineTo(250, yL[i]); ctx.moveTo(350, yL[i]); ctx.lineTo(600, yL[i]); } ctx.stroke();
+                drawR_ohm(250, 100, "R1:" + R1 + "Ω", (V / R1).toFixed(2) + "A"); drawR_ohm(250, 225, "R2:" + R2 + "Ω", (V / R2).toFixed(2) + "A"); drawR_ohm(250, 350, "R3:" + R3 + "Ω", (V / R3).toFixed(2) + "A");
+            }
+            animasyonID = requestAnimationFrame(calistirOhm);
+        };
+
+        // 6. Üreteçler
+        const calistirUretec = function() {
+            let n = parseFloat(document.getElementById('ur-inp-n').value), e = parseFloat(document.getElementById('ur-inp-e').value), r_in = parseFloat(document.getElementById('ur-inp-r_in').value), R = parseFloat(document.getElementById('ur-inp-R').value);
+            document.getElementById('ur-lbl-n').innerText = n; document.getElementById('ur-lbl-e').innerText = e.toFixed(1); document.getElementById('ur-lbl-r_in').innerText = r_in.toFixed(1); document.getElementById('ur-lbl-R').innerText = R;
+            
+            let v_top = 0, r_top = 0;
+            if (urMode === 'seri') { v_top = n * e; r_top = n * r_in; } else { v_top = e; r_top = r_in / n; }
+            let I = v_top / (R + r_top), P = Math.pow(I, 2) * R, brightness = Math.min(P / 5, 1);
+            
+            document.getElementById('ur-val-emk').innerText = v_top.toFixed(2) + " V"; document.getElementById('ur-val-r').innerText = r_top.toFixed(2) + " Ω"; document.getElementById('ur-val-i').innerText = I.toFixed(2) + " A"; document.getElementById('ur-val-p').innerText = P.toFixed(2) + " W";
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(200, 225); ctx.lineTo(200, 100); ctx.lineTo(500, 100); ctx.lineTo(500, 225); ctx.stroke();
+            
+            let lX = 350, lY = 100;
+            if (P > 0.01) { ctx.beginPath(); ctx.arc(lX, lY, 30 + brightness * 40, 0, Math.PI * 2); let grad = ctx.createRadialGradient(lX, lY, 10, lX, lY, 30 + brightness * 40); grad.addColorStop(0, 'rgba(255, 215, 0, ' + (0.4 + brightness * 0.4) + ')'); grad.addColorStop(1, 'rgba(255, 215, 0, 0)'); ctx.fillStyle = grad; ctx.fill(); }
+            ctx.beginPath(); ctx.arc(lX, lY, 20, 0, Math.PI * 2); ctx.fillStyle = P > 0.01 ? 'rgba(255, 240, 100, ' + (0.5 + brightness * 0.5) + ')' : '#333'; ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#7f8c8d'; ctx.fillRect(lX - 10, lY + 15, 20, 15); ctx.fillStyle = '#fff'; ctx.font = '16px Arial'; ctx.textAlign = 'center'; ctx.fillText("Lamba R: " + R + "Ω", lX, lY - 40);
+
+            if (urMode === 'seri') {
+                let pStart = 200 + (300 - (n * 40)) / 2; ctx.beginPath(); ctx.moveTo(200, 225); ctx.lineTo(500, 225); ctx.stroke();
+                for (let i = 0; i < n; i++) { let px = pStart + (i * 40); ctx.fillStyle = '#2c3e50'; ctx.fillRect(px, 210, 30, 30); ctx.fillStyle = '#e74c3c'; ctx.fillRect(px, 210, 5, 30); }
+            } else {
+                let pAralik = 200 / n, yStart = 225 - (n * pAralik) / 2 + (pAralik / 2);
+                ctx.beginPath(); ctx.moveTo(200, yStart); ctx.lineTo(200, yStart + (n - 1) * pAralik); ctx.stroke(); ctx.beginPath(); ctx.moveTo(500, yStart); ctx.lineTo(500, yStart + (n - 1) * pAralik); ctx.stroke();
+                for (let i = 0; i < n; i++) { let py = yStart + (i * pAralik); ctx.beginPath(); ctx.moveTo(200, py); ctx.lineTo(500, py); ctx.stroke(); ctx.fillStyle = '#2c3e50'; ctx.fillRect(335, py - 15, 30, 30); ctx.fillStyle = '#e74c3c'; ctx.fillRect(335, py - 15, 5, 30); }
+            }
+            animasyonID = requestAnimationFrame(calistirUretec);
+        };
+
+        // 7. Selenoid
+        const calistirSelenoid = function() {
+            let N = parseInt(document.getElementById('sel-n').value), I = parseFloat(document.getElementById('sel-i').value);
+            let L = 300, startX = 225, centerY = 225;
+            document.getElementById('sel-lbl-n').innerText = N; document.getElementById('sel-lbl-i').innerText = I;
+            document.getElementById('sel-b').innerText = Math.abs(N * I / L * 100).toFixed(2); document.getElementById('sel-dir').innerText = I > 0 ? "Sağ" : (I < 0 ? "Sol" : "Yok");
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = "#7f8c8d"; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(startX - 80, centerY + 50); ctx.lineTo(startX, centerY + 50); ctx.stroke(); ctx.beginPath(); ctx.moveTo(startX + L, centerY + 50); ctx.lineTo(startX + L + 80, centerY + 50); ctx.stroke();
+            if (I !== 0) { ctx.fillStyle = "#e74c3c"; let dir = I > 0 ? 1 : -1; ctx.beginPath(); ctx.moveTo(startX - 40, centerY + 44); ctx.lineTo(startX - 40 + (dir * 12), centerY + 50); ctx.lineTo(startX - 40, centerY + 56); ctx.fill(); ctx.beginPath(); ctx.moveTo(startX + L + 40, centerY + 44); ctx.lineTo(startX + L + 40 + (dir * 12), centerY + 50); ctx.lineTo(startX + L + 40, centerY + 56); ctx.fill(); }
+
+            ctx.fillStyle = "rgba(149, 165, 166, 0.15)"; ctx.fillRect(startX - 10, centerY - 35, L + 20, 70);
+            ctx.strokeStyle = "#e67e22"; ctx.lineWidth = 3;
+            for (let i = 0; i < N; i++) { let px = startX + (i * (L / N)); ctx.beginPath(); ctx.ellipse(px, centerY, 15, 40, 0, 0, Math.PI * 2); ctx.stroke(); if (I !== 0) { ctx.fillStyle = "#e74c3c"; ctx.beginPath(); let okX = px + 15; if (I > 0) { ctx.moveTo(okX - 5, centerY - 6); ctx.lineTo(okX, centerY + 8); ctx.lineTo(okX + 5, centerY - 6); } else { ctx.moveTo(okX - 5, centerY + 6); ctx.lineTo(okX, centerY - 8); ctx.lineTo(okX + 5, centerY + 6); } ctx.fill(); } }
+
+            if (I !== 0) { ctx.strokeStyle = "rgba(231, 76, 60, 0.4)"; ctx.lineWidth = 1; for (let j = -3; j <= 3; j++) { ctx.beginPath(); ctx.moveTo(startX - 60, centerY + j * 10); ctx.lineTo(startX + L + 60, centerY + j * 10); ctx.stroke(); let arrowX = I > 0 ? startX + L + 45 : startX - 45; ctx.beginPath(); ctx.moveTo(arrowX, centerY + j * 10); ctx.lineTo(arrowX - (I > 0 ? 10 : -10), centerY + j * 10 - 4); ctx.lineTo(arrowX - (I > 0 ? 10 : -10), centerY + j * 10 + 4); ctx.fillStyle = "rgba(231, 76, 60, 0.7)"; ctx.fill(); } }
+
+            ctx.save(); ctx.translate(cursor.x, cursor.y); let angle = 0;
+            if (cursor.x > startX && cursor.x < startX + L && Math.abs(cursor.y - centerY) < 60) { angle = I > 0 ? 0 : Math.PI; } else { angle = Math.atan2(cursor.y - centerY, cursor.x - (startX + L / 2)); if (I < 0) angle += Math.PI; } if (I === 0) angle = -Math.PI / 2;
+            ctx.rotate(angle); ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI * 2); ctx.fillStyle = "#2c3e50"; ctx.fill(); ctx.strokeStyle = "#bdc3c7"; ctx.lineWidth = 3; ctx.stroke(); ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(0, -6); ctx.lineTo(0, 6); ctx.fillStyle = "#e74c3c"; ctx.fill(); ctx.beginPath(); ctx.moveTo(-18, 0); ctx.lineTo(0, -6); ctx.lineTo(0, 6); ctx.fillStyle = "#bdc3c7"; ctx.fill(); ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fillStyle = "#fff"; ctx.fill(); ctx.restore();
+
+            animasyonID = requestAnimationFrame(calistirSelenoid);
+        };
+
+        // 8. Renk
+        const calistirRenk = function() {
+            let isik = document.getElementById('optik-isik').value, zemin = document.getElementById('optik-zemin').value, nesne = document.getElementById('optik-nesne').value;
+            let algZemin = algilananRengiHesapla(isik, zemin), algNesne = algilananRengiHesapla(isik, nesne);
+            
+            document.getElementById('res-zemin').innerText = optikIsimler[algZemin]; document.getElementById('res-nesne').innerText = optikIsimler[algNesne];
+            document.getElementById('res-zemin').style.color = (algZemin === 'beyaz') ? '#bdc3c7' : optikRenkler[algZemin]; document.getElementById('res-nesne').style.color = (algNesne === 'beyaz') ? '#bdc3c7' : optikRenkler[algNesne];
+
+            let kam = document.getElementById('kamuflaj-durumu');
+            if (algZemin === algNesne) { kam.innerText = "KAMUFLE OLDU (Görünmez)"; kam.style.backgroundColor = "rgba(231, 76, 60, 0.2)"; kam.style.color = "#c0392b"; } else { kam.innerText = "NET OLARAK GÖRÜNÜR"; kam.style.backgroundColor = "rgba(46, 204, 113, 0.2)"; kam.style.color = "#27ae60"; }
