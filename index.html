@@ -293,16 +293,9 @@
     </div>
 
     <script>
-        // Hata yakalama sistemi
-        window.onerror = function(msg) {
-            alert("Sistemde bir sorun var: " + msg + "\nLütfen 'Gizli Sekme'den girip tekrar deneyin.");
-            return false;
-        };
-
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         
-        // GENEL SİSTEM DEĞİŞKENLERİ
         let currentSimulation = ''; 
         let animasyonID = null; 
         let cursor = { x: 375, y: 225 };
@@ -314,7 +307,6 @@
         let lastTime = performance.now();
         let t_alan_kondansator = 0;
 
-        // RENK KÜTÜPHANESİ
         const optikRenkler = { 'beyaz':'#ffffff', 'kirmizi':'#e74c3c', 'yesil':'#2ecc71', 'mavi':'#3498db', 'sari':'#f1c40f', 'magenta':'#9b59b6', 'turuncu':'#e67e22', 'siyah':'#1e1e24' };
         const optikIsimler = { 'beyaz':'Beyaz', 'kirmizi':'Kırmızı', 'yesil':'Yeşil', 'mavi':'Mavi', 'sari':'Sarı', 'magenta':'Mor', 'turuncu':'Turuncu', 'siyah':'Siyah' };
         
@@ -326,7 +318,6 @@
             return 'siyah';
         }
 
-        // FARE VE DOKUNMATİK TAKİP
         function updateCursor(e) {
             const rect = canvas.getBoundingClientRect();
             let clientX = e.clientX || (e.touches && e.touches[0].clientX);
@@ -339,9 +330,7 @@
         canvas.addEventListener('mousemove', updateCursor);
         canvas.addEventListener('touchmove', function(e) { e.preventDefault(); updateCursor(e); }, {passive: false});
 
-        // BAŞLANGIÇ AYARLARI VE BUTON ATAMALARI
         function setupControls() {
-            // Levha Deneyi
             let btnFire = document.getElementById('btn_fire');
             if(btnFire) {
                 btnFire.onclick = function() {
@@ -351,7 +340,6 @@
                 };
             }
             
-            // Ohm Deneyi
             let btnOhmSeri = document.getElementById('btn-seri');
             let btnOhmParalel = document.getElementById('btn-paralel');
             if(btnOhmSeri && btnOhmParalel) {
@@ -367,7 +355,6 @@
                 };
             }
 
-            // Üreteç Deneyi
             let btnUrSeri = document.getElementById('ur-btn-seri');
             let btnUrParalel = document.getElementById('ur-btn-paralel');
             if(btnUrSeri && btnUrParalel) {
@@ -389,7 +376,6 @@
         }
         setupControls();
 
-        // ÇİZİM YARDIMCILARI
         function drawArrow(x, y, vx, vy, color, width) {
             let len = Math.sqrt(vx * vx + vy * vy);
             if (len < 1) return;
@@ -415,7 +401,6 @@
             ctx.lineTo(x + 100, y); ctx.stroke(); ctx.fillStyle = '#fff'; ctx.font = '14px Arial'; ctx.fillText(lbl, x + 50, y - 20); ctx.fillStyle = '#3498db'; ctx.font = 'bold 16px Arial'; ctx.fillText(vText, x + 50, y + 30);
         }
 
-        // ================= DENEY MOTORLARI =================
         function cizManyetizma() {
             let iW = parseFloat(document.getElementById('sliderWire').value) || 0;
             let iL = parseFloat(document.getElementById('sliderLoop').value) || 0;
@@ -754,7 +739,6 @@
             let dt = (currentTime - lastTime) / 1000;
             lastTime = currentTime;
 
-            // Arkaplan Rengi (Geçişler Temiz Olsun Diye)
             if (['kondansator','ohm','uretec','selenoid'].includes(currentSimulation)) {
                 ctx.fillStyle = "#1e1e24";
             } else {
@@ -762,7 +746,6 @@
             }
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // İlgili Deneyi Çalıştır (Bağımsız Modüller)
             try {
                 if (currentSimulation === 'manyetizma') cizManyetizma();
                 else if (currentSimulation === 'dalga') cizDalga(dt);
@@ -774,9 +757,7 @@
                 else if (currentSimulation === 'renk') cizRenk();
                 else if (currentSimulation === 'kuvvet_paralel') cizKuvvetParalel();
                 else if (currentSimulation === 'kuvvet_icedisa') cizKuvvetIceDisa();
-            } catch(e) {
-                console.log("Çizim sırasında hata yakalandı, motor devam ediyor:", e);
-            }
+            } catch(e) {}
 
             animasyonID = requestAnimationFrame(anaMotor);
         }
@@ -793,7 +774,6 @@
                 if (elem) elem.style.display = (paneller[i] === simId) ? 'block' : 'none';
             }
 
-            // Durumları Sıfırla
             particle.running = false; particle.x = 100; particle.v = 0;
             lastTime = performance.now();
 
