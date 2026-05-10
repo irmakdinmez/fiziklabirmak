@@ -10,9 +10,12 @@
             --secondary-color: #3498db;
             --bg-color: #f0f2f5;
         }
+        
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); margin: 0; color: #333; touch-action: manipulation; }
+        
         .header { background: var(--primary-color); color: white; text-align: center; padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .quote { font-style: italic; color: #bdc3c7; font-size: 1.1rem; margin-top: 10px; }
+
         .container { max-width: 1200px; margin: 2rem auto; padding: 0 20px; }
         
         .simulation-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
@@ -135,7 +138,10 @@
                         <label>Genlik (A): <span id="amp-val" class="highlight">50</span> px</label>
                         <input type="range" id="amp" min="10" max="150" step="5" value="50">
                     </div>
-                    <div class="formula-box"><b style="color:#2c3e50;">v = λ × f</b><br>Hız = <span id="speed-val" style="color:#27ae60; font-weight:bold;">100</span> px/s</div>
+                    <div class="formula-box">
+                        <b style="color:#2c3e50;">v = λ × f</b><br>
+                        Hız = <span id="speed-val" style="color:#27ae60; font-weight:bold;">100</span> px/s
+                    </div>
                 </div>
 
                 <div id="panel_levha" class="panel" style="display: none;">
@@ -146,7 +152,7 @@
                         <label>Yavaşlatıcı (V2): <span id="vdec-val" class="highlight">30</span> V</label>
                         <input type="range" id="Vdec" min="0" max="100" step="1" value="30">
                     </div>
-                    <button class="btn" style="background-color: #27ae60; margin-top: 20px;" onclick="particle.x = 100; particle.v = 0; particle.running = true;">Parçacığı Fırlat</button>
+                    <button id="btn_fire" class="btn" style="background-color: #27ae60; margin-top: 20px;">Parçacığı Fırlat</button>
                 </div>
 
                 <div id="panel_kondansator" class="panel" style="display: none;">
@@ -166,7 +172,111 @@
 
                 <div id="panel_ohm" class="panel" style="display: none;">
                     <div class="mode-switch">
-                        <button id="btn-seri" class="mode-btn active" onclick="ohmMode='seri'; this.classList.add('active'); document.getElementById('btn-paralel').classList.remove('active');">SERİ BAĞLANTI</button>
-                        <button id="btn-paralel" class="mode-btn" onclick="ohmMode='paralel'; this.classList.add('active'); document.getElementById('btn-seri').classList.remove('active');">PARALEL BAĞLANTI</button>
+                        <button id="btn-seri" class="mode-btn active">SERİ BAĞLANTI</button>
+                        <button id="btn-paralel" class="mode-btn">PARALEL BAĞLANTI</button>
                     </div>
-                    <div class="data-panel-c" style="margin-bottom:
+                    <div class="data-panel-c" style="margin-bottom: 10px;">
+                        <div class="data-item-c"><span class="data-label-c">EŞDEĞER DİRENÇ</span><span class="data-value-c" id="ohm-val-req">0.00 Ω</span></div>
+                        <div class="data-item-c"><span class="data-label-c">ANA AKIM</span><span class="data-value-c" id="ohm-val-itot">0.00 A</span></div>
+                    </div>
+                    <div class="control-group" style="margin-bottom: 0;">
+                        <label>Üreteç Gerilimi: <span id="ohm-lbl-v" class="highlight">24</span> V</label>
+                        <input type="range" id="ohm-inp-v" min="1" max="60" value="24" step="1">
+                        <label style="color:#e74c3c;">Koruma Direnci: <span class="highlight">1</span> Ω (Sabit)</label>
+                        <label>R1 Direnci: <span id="ohm-lbl-r1" class="highlight">4</span> Ω</label>
+                        <input type="range" id="ohm-inp-r1" min="1" max="50" value="4" step="1">
+                        <label>R2 Direnci: <span id="ohm-lbl-r2" class="highlight">6</span> Ω</label>
+                        <input type="range" id="ohm-inp-r2" min="1" max="50" value="6" step="1">
+                        <label>R3 Direnci: <span id="ohm-lbl-r3" class="highlight">12</span> Ω</label>
+                        <input type="range" id="ohm-inp-r3" min="1" max="50" value="12" step="1">
+                    </div>
+                </div>
+
+                <div id="panel_uretec" class="panel" style="display: none;">
+                    <div class="data-panel-c">
+                        <div class="data-item-c"><span class="data-label-c">TOPLAM EMK</span><span class="data-value-c" id="ur-val-emk" style="color:#e67e22">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">ANA AKIM</span><span class="data-value-c" id="ur-val-i" style="color:#3498db">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">EŞDEĞER r</span><span class="data-value-c" id="ur-val-r" style="color:#bdc3c7">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">LAMBA GÜCÜ</span><span class="data-value-c" id="ur-val-p" style="color:#f1c40f">0.00</span></div>
+                    </div>
+                    <div class="control-group" style="border:none; padding:0;">
+                        <div class="mode-switch">
+                            <button id="ur-btn-seri" class="mode-btn active" style="background-color: #e67e22;">PİLLER SERİ</button>
+                            <button id="ur-btn-paralel" class="mode-btn">PİLLER PARALEL</button>
+                        </div>
+                        <label>Üreteç Sayısı (n): <span id="ur-lbl-n" class="highlight">3</span></label>
+                        <input type="range" id="ur-inp-n" min="1" max="10" value="3" step="1">
+                        <label>1 Pilin Emk'sı (ε): <span id="ur-lbl-e" class="highlight">1.5</span> V</label>
+                        <input type="range" id="ur-inp-e" min="1.0" max="12.0" value="1.5" step="0.5">
+                        <label>1 Pilin İç Direnci (r): <span id="ur-lbl-r_in" class="highlight">0.5</span> Ω</label>
+                        <input type="range" id="ur-inp-r_in" min="0.0" max="5.0" value="0.5" step="0.1">
+                        <label>Dış Direnç Lamba (R): <span id="ur-lbl-R" class="highlight">10</span> Ω</label>
+                        <input type="range" id="ur-inp-R" min="1" max="50" value="10" step="1">
+                    </div>
+                </div>
+
+                <div id="panel_selenoid" class="panel" style="display: none;">
+                    <div class="data-panel-c">
+                        <div class="data-item-c"><span class="data-label-c">MERKEZ ALAN (B)</span><span class="data-value-c" id="sel-b" style="color:#e74c3c">0.00</span></div>
+                        <div class="data-item-c"><span class="data-label-c">ALAN YÖNÜ</span><span class="data-value-c" id="sel-dir" style="color:#f1c40f">-</span></div>
+                    </div>
+                    <div class="control-group" style="border:none; padding:0;">
+                        <label>Sarım Sayısı (N): <span id="sel-lbl-n" class="highlight">15</span></label>
+                        <input type="range" id="sel-n" min="5" max="30" value="15" step="1">
+                        <label>Akım Şiddeti (I): <span id="sel-lbl-i" class="highlight">5</span> A</label>
+                        <input type="range" id="sel-i" min="-10" max="10" value="5" step="1">
+                    </div>
+                    <div class="formula-box" style="font-size:0.9rem">
+                        <b>B = 4π · K · (N/L) · I</b> <br> 
+                        <span style="font-size:0.8rem; color:#666">Pusulayı parmağınızla tuval üzerinde gezdirin.</span>
+                    </div>
+                </div>
+
+                <div id="panel_renk" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <label>Işık Rengi:
+                            <select id="optik-isik" class="optik-select">
+                                <option value="beyaz">Beyaz</option><option value="kirmizi">Kırmızı</option><option value="yesil">Yeşil</option><option value="mavi">Mavi</option>
+                            </select>
+                        </label>
+                        <label>Zemin Rengi:
+                            <select id="optik-zemin" class="optik-select">
+                                <option value="yesil">Yeşil</option><option value="kirmizi">Kırmızı</option><option value="mavi">Mavi</option><option value="beyaz">Beyaz</option><option value="magenta">Magenta</option>
+                            </select>
+                        </label>
+                        <label>Cisim Rengi:
+                            <select id="optik-nesne" class="optik-select">
+                                <option value="sari">Sarı</option><option value="turuncu">Turuncu</option><option value="mavi">Mavi</option><option value="yesil">Yeşil</option><option value="magenta">Magenta</option><option value="kirmizi">Kırmızı</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="data-panel-c" style="grid-template-columns: 1fr;">
+                        <div class="data-item-c" style="margin-bottom:5px;">
+                            <span class="data-label-c">Zemin Nasıl Görünür?</span>
+                            <span class="data-value-c" id="res-zemin">-</span>
+                        </div>
+                        <div class="data-item-c">
+                            <span class="data-label-c">Cisim Nasıl Görünür?</span>
+                            <span class="data-value-c" id="res-nesne">-</span>
+                        </div>
+                    </div>
+                    <div id="kamuflaj-durumu" style="text-align:center; font-weight:bold; font-size:14px; padding:10px; border-radius:5px;"></div>
+                </div>
+
+                <div id="panel_kuvvet_paralel" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Teller Arası Kuvvet</h3>
+                        <label style="color: blue;">1. Tel Akımı (I₁): <span id="kp-val1" class="highlight">5</span> A</label>
+                        <input type="range" id="kp-i1" min="-10" max="10" value="5" step="1">
+                        <label style="color: red; margin-top: 15px;">2. Tel Akımı (I₂): <span id="kp-val2" class="highlight">5</span> A</label>
+                        <input type="range" id="kp-i2" min="-10" max="10" value="5" step="1">
+                    </div>
+                    <div class="formula-box" style="font-size:0.9rem">
+                        <b>Not:</b> Pozitif akım yukarı, negatif aşağı yönlüdür.<br>Aynı yönlüler <b>çeker</b>, zıt yönlüler <b>iter</b>.
+                    </div>
+                </div>
+
+                <div id="panel_kuvvet_icedisa" class="panel" style="display: none;">
+                    <div class="control-group">
+                        <h3>Teller Arası Kuvvet</h3>
+                        <label style="color: #0d6efd;">1. Tel Akımı (I₁): <span id="ki-val1" class="highlight">5</span>
