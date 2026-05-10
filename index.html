@@ -500,3 +500,124 @@
 
             let kam = document.getElementById('kamuflaj-durumu');
             if (algZemin === algNesne) { kam.innerText = "KAMUFLE OLDU (Görünmez)"; kam.style.backgroundColor = "rgba(231, 76, 60, 0.2)"; kam.style.color = "#c0392b"; } else { kam.innerText = "NET OLARAK GÖRÜNÜR"; kam.style.backgroundColor = "rgba(46, 204, 113, 0.2)"; kam.style.color = "#27ae60"; }
+
+            ctx.fillStyle = optikRenkler[algZemin]; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            let grad = ctx.createLinearGradient(0, 0, 0, canvas.height); grad.addColorStop(0, optikRenkler[isik]); grad.addColorStop(1, 'rgba(0,0,0,0.8)'); ctx.globalAlpha = 0.25; ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.globalAlpha = 1.0;
+            ctx.fillStyle = optikRenkler[algNesne]; ctx.strokeStyle = algZemin === algNesne ? optikRenkler[algZemin] : 'rgba(0,0,0,0.4)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.fillRect(150, 200, 450, 80); if (algZemin !== algNesne) ctx.strokeRect(150, 200, 450, 80);
+            ctx.fillStyle = '#34495e'; ctx.beginPath(); ctx.moveTo(335, 0); ctx.lineTo(415, 0); ctx.lineTo(400, 40); ctx.lineTo(350, 40); ctx.fill(); ctx.fillStyle = optikRenkler[isik]; ctx.fillRect(350, 40, 50, 10);
+            
+            animasyonID = requestAnimationFrame(calistirRenk);
+        };
+
+        // 9. Kuvvet (Paralel)
+        const calistirKuvvetParalel = function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let i1 = parseFloat(document.getElementById('kp-i1').value), i2 = parseFloat(document.getElementById('kp-i2').value);
+            document.getElementById('kp-val1').innerText = i1; document.getElementById('kp-val2').innerText = i2;
+
+            const w1X = 275, w2X = 475;
+            ctx.lineWidth = 8; ctx.lineCap = "round"; ctx.strokeStyle = "#adb5bd"; ctx.beginPath(); ctx.moveTo(w1X, 50); ctx.lineTo(w1X, 400); ctx.stroke(); ctx.beginPath(); ctx.moveTo(w2X, 50); ctx.lineTo(w2X, 400); ctx.stroke();
+
+            function drawOkP(fx, fy, tx, ty, clr, txt, isF) {
+                let hlen = isF ? 12 : 8, dx = tx - fx, dy = ty - fy, ang = Math.atan2(dy, dx);
+                ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(tx, ty); ctx.lineTo(tx - hlen * Math.cos(ang - Math.PI / 6), ty - hlen * Math.sin(ang - Math.PI / 6)); ctx.moveTo(tx, ty); ctx.lineTo(tx - hlen * Math.cos(ang + Math.PI / 6), ty - hlen * Math.sin(ang + Math.PI / 6)); ctx.strokeStyle = clr; ctx.lineWidth = isF ? 4 : 3; ctx.stroke();
+                if (txt) { ctx.fillStyle = clr; ctx.font = "bold 18px Arial"; ctx.fillText(txt, isF ? (fx + tx) / 2 - 5 : tx + 10, fy - 15); }
+            }
+
+            if (i1 !== 0) drawOkP(w1X, 225 + (i1 > 0 ? -30 : 30), w1X, 225 + (i1 > 0 ? -90 : 90), "blue", "I₁", false);
+            if (i2 !== 0) drawOkP(w2X, 225 + (i2 > 0 ? -30 : 30), w2X, 225 + (i2 > 0 ? -90 : 90), "red", "I₂", false);
+
+            if (i1 !== 0 && i2 !== 0) {
+                let fLen = Math.min(Math.max(Math.abs(i1 * i2) * 1.5, 20), 90), isAtt = (i1 * i2) > 0;
+                drawOkP(w1X, 225, isAtt ? w1X + fLen : w1X - fLen, 225, "#28a745", "F", true); drawOkP(w2X, 225, isAtt ? w2X - fLen : w2X + fLen, 225, "#28a745", "F", true);
+            }
+            animasyonID = requestAnimationFrame(calistirKuvvetParalel);
+        };
+
+        // 10. Kuvvet (İçe/Dışa)
+        const calistirKuvvetIceDisa = function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let i1 = parseFloat(document.getElementById('ki-i1').value), i2 = parseFloat(document.getElementById('ki-i2').value);
+            document.getElementById('ki-val1').innerText = i1; document.getElementById('ki-val2').innerText = i2;
+
+            const w1X = 275, w2X = 475, wRad = 50, cY = 225;
+
+            function drawOkID(fx, fy, tx, ty, clr, txt) {
+                let dx = tx - fx, dy = ty - fy, ang = Math.atan2(dy, dx);
+                ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(tx, ty); ctx.lineTo(tx - 18 * Math.cos(ang - Math.PI / 6), ty - 18 * Math.sin(ang - Math.PI / 6)); ctx.moveTo(tx, ty); ctx.lineTo(tx - 18 * Math.cos(ang + Math.PI / 6), ty - 18 * Math.sin(ang + Math.PI / 6)); ctx.strokeStyle = clr; ctx.lineWidth = 6; ctx.stroke();
+                if (txt) { ctx.fillStyle = clr; ctx.font = "bold 26px Arial"; ctx.fillText(txt, (fx + tx) / 2 - 10, fy - 20); }
+            }
+
+            function drawW(x, y, cur, clr, lbl) {
+                ctx.beginPath(); ctx.arc(x, y, wRad, 0, 2 * Math.PI); ctx.lineWidth = 10; ctx.strokeStyle = "#212529"; ctx.fillStyle = "#e9ecef"; ctx.fill(); ctx.stroke();
+                ctx.fillStyle = clr; ctx.font = "bold 28px Arial"; ctx.fillText(lbl, x - 15, y - wRad - 20);
+                if (cur > 0) { ctx.beginPath(); ctx.arc(x, y, 14, 0, 2 * Math.PI); ctx.fillStyle = "#000"; ctx.fill(); } 
+                else if (cur < 0) { ctx.beginPath(); ctx.moveTo(x - 18, y - 18); ctx.lineTo(x + 18, y + 18); ctx.moveTo(x + 18, y - 18); ctx.lineTo(x - 18, y + 18); ctx.lineWidth = 10; ctx.strokeStyle = "#000"; ctx.stroke(); }
+            }
+
+            drawW(w1X, cY, i1, "#0d6efd", "I₁"); drawW(w2X, cY, i2, "#dc3545", "I₂");
+
+            if (i1 !== 0 && i2 !== 0) {
+                let fLen = Math.min(Math.max(Math.abs(i1 * i2) * 1.8, 30), 100);
+                if ((i1 * i2) > 0) { drawOkID(w1X + wRad + 5, cY, w1X + wRad + fLen, cY, "#198754", "F"); drawOkID(w2X - wRad - 5, cY, w2X - wRad - fLen, cY, "#198754", "F"); } 
+                else { drawOkID(w1X - wRad - 5, cY, w1X - wRad - fLen, cY, "#198754", "F"); drawOkID(w2X + wRad + 5, cY, w2X + wRad + fLen, cY, "#198754", "F"); }
+            }
+            animasyonID = requestAnimationFrame(calistirKuvvetIceDisa);
+        };
+
+        // ------------------ DÜĞME VE PANELLERİ YÖNETME ------------------
+        // Buton dinleyicilerini sadece bir kere tanımlayalım ki sistem kilitlenmesin
+        document.getElementById('btn-seri').onclick = function() { ohmMode = 'seri'; this.classList.add('active'); document.getElementById('btn-paralel').classList.remove('active'); };
+        document.getElementById('btn-paralel').onclick = function() { ohmMode = 'paralel'; this.classList.add('active'); document.getElementById('btn-seri').classList.remove('active'); };
+        
+        let urBtnS = document.getElementById('ur-btn-seri'), urBtnP = document.getElementById('ur-btn-paralel');
+        urBtnS.onclick = function() { urMode = 'seri'; urBtnS.classList.add('active'); urBtnS.style.backgroundColor = '#e67e22'; urBtnP.classList.remove('active'); urBtnP.style.backgroundColor = ''; };
+        urBtnP.onclick = function() { urMode = 'paralel'; urBtnP.classList.add('active'); urBtnP.style.backgroundColor = '#e67e22'; urBtnS.classList.remove('active'); urBtnS.style.backgroundColor = ''; };
+        
+        document.getElementById('btn_fire').onclick = function() { particle.x = 100; particle.v = 0; particle.running = true; };
+        
+        document.getElementById('sliderWire').addEventListener('input', function(){ if(currentSimulation==='manyetizma') cizManyetizma(); });
+        document.getElementById('sliderLoop').addEventListener('input', function(){ if(currentSimulation==='manyetizma') cizManyetizma(); });
+        document.getElementById('checkWire').addEventListener('change', function(){ if(currentSimulation==='manyetizma') cizManyetizma(); });
+        document.getElementById('checkLoop').addEventListener('change', function(){ if(currentSimulation==='manyetizma') cizManyetizma(); });
+
+        // MENÜDEN DENEY SEÇİMİ
+        function openSimulation(simId) {
+            try {
+                currentSimulation = simId;
+                document.getElementById('mainMenu').style.display = 'none';
+                document.getElementById('simArea').style.display = 'block';
+                
+                let paneller = ['manyetizma', 'dalga', 'levha', 'kondansator', 'ohm', 'uretec', 'selenoid', 'renk', 'kuvvet_paralel', 'kuvvet_icedisa'];
+                for (let i = 0; i < paneller.length; i++) {
+                    let elem = document.getElementById('panel_' + paneller[i]);
+                    if (elem) { elem.style.display = (paneller[i] === simId) ? 'block' : 'none'; }
+                }
+
+                if (animasyonID) cancelAnimationFrame(animasyonID);
+                canvas.style.background = (simId==='kondansator'||simId==='ohm'||simId==='uretec'||simId==='selenoid') ? '#1e1e24' : '#ffffff';
+
+                if (simId === 'manyetizma') { cizManyetizma(); }
+                else if (simId === 'dalga') { calistirDalga(); }
+                else if (simId === 'levha') { particle.running = false; particle.x = 100; particle.v = 0; calistirLevha(); }
+                else if (simId === 'kondansator') { calistirKondansator(); }
+                else if (simId === 'ohm') { calistirOhm(); }
+                else if (simId === 'uretec') { calistirUretec(); }
+                else if (simId === 'selenoid') { calistirSelenoid(); }
+                else if (simId === 'renk') { calistirRenk(); }
+                else if (simId === 'kuvvet_paralel') { calistirKuvvetParalel(); }
+                else if (simId === 'kuvvet_icedisa') { calistirKuvvetIceDisa(); }
+            } catch (err) {
+                alert("Simülasyon açılırken bir hata oluştu: " + err.message);
+            }
+        }
+
+        function closeSimulation() {
+            currentSimulation = '';
+            if (animasyonID) cancelAnimationFrame(animasyonID);
+            document.getElementById('mainMenu').style.display = 'flex';
+            document.getElementById('simArea').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
